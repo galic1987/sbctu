@@ -53,7 +53,7 @@ public GuestGroup(Long id) {
 	}
 	
 	
-	public boolean leaveTheTableAndThePizzeriaAndGoWOderPFefferWächst(){
+	public boolean leaveTheTableAndThePizzeriaAndGoWOderPFeffer(){
 		//TODO
 		return true;
 	}
