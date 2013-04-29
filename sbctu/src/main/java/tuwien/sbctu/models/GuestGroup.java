@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class GuestGroup extends Person{
-public GuestGroup(Long id) {
+
+	/**
+	 * 
+	 */
+	
+	public GuestGroup(Long id) {
 		super(id);
 		// TODO Auto-generated constructor stub
 	}
 
-
-/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	private int groupSize;
