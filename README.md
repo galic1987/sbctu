@@ -24,9 +24,13 @@ mvn clean
 
 To run with arguments run:
 
+
+Start app administration:
 mvn exec:java -Dexec.mainClass="tuwien.sbctu.App2" -Dexec.args="arg1 arg2"
 
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.App" -Dexec.args="arg1 arg2"
+
+Start core:
+mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server"
 
 
 

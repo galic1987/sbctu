@@ -52,7 +52,9 @@ public class Pizzeria {
 	
 	public Pizzeria() throws MzsCoreException,
 	InterruptedException {
-		core = DefaultMzsCore.newInstance(0);
+		
+		
+		core = DefaultMzsCore.newInstance();
 		capi = new Capi(core);
 
 		try {

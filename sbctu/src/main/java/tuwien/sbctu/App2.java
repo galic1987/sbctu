@@ -17,7 +17,7 @@ public class App2 {
 	 */
 	public static void main(String[] args) throws MzsCoreException {
 		// TODO Auto-generated method stub
-        System.out.println( "Hello World!" + args.toString() + args[0]);
+       // System.out.println( "Hello World!" + args.toString() + args[0]);
         System.out.println("MozartSpaces: simple 'Hello, space!' with synchronous core interface");
         		// create an embedded space and construct a Capi instance for it
         		MzsCore core = DefaultMzsCore.newInstance();
@@ -31,9 +31,9 @@ public class App2 {
         		ArrayList<String> resultEntries = capi.read(container);
         		System.out.println("Entry read: " + resultEntries.get(0));
         		// destroy the container
-        		capi.destroyContainer(container, null);
+        		//capi.destroyContainer(container, null);
         		// shutdown the core
-        		core.shutdown(true);
+        		//core.shutdown(true);
 	}
 
 }
