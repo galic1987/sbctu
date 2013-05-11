@@ -21,6 +21,7 @@ import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 
 import tuwien.sbctu.conf.PizzeriaConfiguration;
+import tuwien.sbctu.models.GuestGroup;
 
 public class App2 {
 
@@ -77,7 +78,7 @@ public class App2 {
 	
 		
 		
-        ArrayList<String> entries = new ArrayList<String>();
+        ArrayList<GuestGroup> entries = new ArrayList<GuestGroup>();
 
 		
 		for (;;) {
@@ -93,10 +94,10 @@ public class App2 {
                 System.out.println("transaction timeout. retry.");
                 continue;
             }
-            String message = entries.get(0);
+            GuestGroup message = entries.get(0);
 
             // output
-            System.out.println(message);
+            System.out.println(message.getId());
           
 
             capi.commitTransaction(tx);

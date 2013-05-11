@@ -2,8 +2,11 @@ package tuwien.sbctu;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
+import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
+import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
@@ -41,6 +44,7 @@ public class Pizzeria {
 	
 	
 	private ContainerReference entrance;
+	private ContainerReference tables;
 	
 	// 3 containers
 //	private final FifoContainerXvsm<GuestGroup> entranceContainer;
@@ -66,9 +70,15 @@ public class Pizzeria {
 
 		manager = new NotificationManager(core);
 		
-	    entrance = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 100, null, 
-				new FifoCoordinator());
+		ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
+        obligatoryCoords.add(new FifoCoordinator());
+        obligatoryCoords.add(new KeyCoordinator());
+		
+	    entrance = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 100, obligatoryCoords, 
+	    		null,null);
 	    
+	    tables = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 100, obligatoryCoords, 
+	    		null,null);
 
 		
 		

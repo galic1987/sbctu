@@ -55,6 +55,7 @@ public class GuestGroup extends Person{
 	
 	public boolean leaveTheTableAndThePizzeriaAndGoWOderPFeffer(){
 		//TODO
+		
 		return true;
 	}
 	
@@ -66,6 +67,6 @@ public class GuestGroup extends Person{
 	}
 	
 	public enum GroupStatus {
-		WELCOME, ENTERED, SITTING, ORDERED, EATING, FINISHED
+		WELCOME, ENTERED, SITTING, ORDERED, EATING, BRINGMEBILL, FINISHED
 	}
 }
