@@ -1,8 +1,12 @@
 package tuwien.sbctu.conf;
 
 public class PizzeriaConfiguration {
-	public final static String LOCAL_SPACE_URI = "xvsm://localhost:9876";
+	public final static String LOCAL_SPACE_URI = "xvsm://localhost:4242";
 
 	public static final String CONTAINER_NAME_TABLES = "tables";
 	public static final String CONTAINER_NAME_BAR = "bar";
-	public static final String CONTAINER_NAME_ENTRANCE = "entrance";}
+	public static final String CONTAINER_NAME_ENTRANCE = "entrance";
+	
+
+
+}

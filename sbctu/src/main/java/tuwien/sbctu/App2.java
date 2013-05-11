@@ -1,6 +1,13 @@
 package tuwien.sbctu;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.core.Capi;
@@ -9,47 +16,92 @@ import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.MzsTimeoutException;
+import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.core.MzsConstants.RequestTimeout;
+
+import tuwien.sbctu.conf.PizzeriaConfiguration;
 
 public class App2 {
 
 	/**
 	 * @param args
 	 * @throws MzsCoreException 
+	 * @throws URISyntaxException 
+	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws MzsCoreException {
+	public static void main(String[] args) throws MzsCoreException, URISyntaxException, IOException, InterruptedException {
 		// TODO Auto-generated method stub
        // System.out.println( "Hello World!" + args.toString() + args[0]);
         System.out.println("MozartSpaces: simple 'Hello, space!' with synchronous core interface");
         		// create an embedded space and construct a Capi instance for it
-        		MzsCore core = DefaultMzsCore.newInstance();
-        		Capi capi = new Capi(core);
-        		// create a container
-        		ContainerReference cref = capi.createContainer(null, null, 5, null, 
-        				new FifoCoordinator());
+//        		MzsCore core = DefaultMzsCore.newInstance();
+//        		Capi capi = new Capi(core);
+//        		// create a container
+//        		ContainerReference cref = capi.createContainer(null, null, 5, null, 
+//        				new FifoCoordinator());
+//        		
+//        		
+//        		
+//        		
+//        		// fill the queue with the numbers 1 to 5
+//        		for (int i = 1; i <= 5; i++) {
+//        		// FifoCoordinator is implicit, no coordination data necessary
+//        		Entry entry = new Entry (i);
+//        		capi.write(cref, entry);
+//        		}
+//        		// read one entry (default selector count of 1)
+//        		ArrayList<Integer> readEntries = capi.read(cref, FifoCoordinator.newSelector(), 0, null);
+//        		// prints 1
+//        		System.out.println(readEntries.get(0));
+//        		// read two entries with 10 ms timeout
+//        		readEntries = capi.read(cref, FifoCoordinator.newSelector(3), 10, null);
+//        		// prints 1
+//        		System.out.println(readEntries.get(0));
+//        		// prints 2
+//        		System.out.println(readEntries.get(1));
+//        		System.out.println(readEntries.get(2));
         		
         		
-        		
-        		
-        		// fill the queue with the numbers 1 to 5
-        		for (int i = 1; i <= 5; i++) {
-        		// FifoCoordinator is implicit, no coordination data necessary
-        		Entry entry = new Entry (i);
-        		capi.write(cref, entry);
-        		}
-        		// read one entry (default selector count of 1)
-        		ArrayList<Integer> readEntries = capi.read(cref, FifoCoordinator.newSelector(), 0, null);
-        		// prints 1
-        		System.out.println(readEntries.get(0));
-        		// read two entries with 10 ms timeout
-        		readEntries = capi.read(cref, FifoCoordinator.newSelector(3), 10, null);
-        		// prints 1
-        		System.out.println(readEntries.get(0));
-        		// prints 2
-        		System.out.println(readEntries.get(1));
-        		System.out.println(readEntries.get(2));
-        		
-        		
-        		
+        		//MzsCore core = Def
+         
+       
+            // display new properties
+            //System.getProperties().list(System.out);
+
+            
+            URI space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI);
+            Capi capi = new Capi(DefaultMzsCore.newInstance(1200));
+		
+	
+		
+		
+        ArrayList<String> entries = new ArrayList<String>();
+
+		
+		for (;;) {
+            // explicit TX to prevent possible loss of taken message when consumer is offline
+            TransactionReference tx = capi.createTransaction(10000, space);
+           
+    		ContainerReference cref = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
+
+			// Take one entry
+            try {
+                entries = capi.take(cref, FifoCoordinator.newSelector(), RequestTimeout.INFINITE, tx);
+            } catch (MzsTimeoutException ex) {
+                System.out.println("transaction timeout. retry.");
+                continue;
+            }
+            String message = entries.get(0);
+
+            // output
+            System.out.println(message);
+          
+
+            capi.commitTransaction(tx);
+            Thread.sleep(1000);
+        }
         		
         		
         		

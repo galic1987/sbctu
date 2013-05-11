@@ -3,6 +3,7 @@ package tuwien.sbctu;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
@@ -39,10 +40,12 @@ public class Pizzeria {
 	private final NotificationManager manager;
 	
 	
+	private ContainerReference entrance;
+	
 	// 3 containers
-	private final FifoContainerXvsm<GuestGroup> entranceContainer;
-	private final IdContainerXvsm tableContainer;
-	private final IdContainerXvsm barContainer;
+//	private final FifoContainerXvsm<GuestGroup> entranceContainer;
+//	private final IdContainerXvsm tableContainer;
+//	private final IdContainerXvsm barContainer;
 
 	
 	
@@ -63,20 +66,22 @@ public class Pizzeria {
 
 		manager = new NotificationManager(core);
 		
-		entranceContainer = new FifoContainerXvsm<>(capi, space,
-				PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE);
-		tableContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_TABLES);
-		barContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_BAR);
+	    entrance = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 100, null, 
+				new FifoCoordinator());
+	    
+
+		
+		
+		
+//		entranceContainer = new FifoContainerXvsm<>(capi, space,
+//				PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE);
+//		tableContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_TABLES);
+//		barContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_BAR);
 	}
 	
 	
 	
-	public GuestGroup checkForNewGuests(){
-		
-		
-		
-		return null;
-	}
+
 	
 	
 	
