@@ -5,18 +5,18 @@ import java.util.ArrayList;
 
 public class GuestGroup extends Person{
 
-	/**
-	 * 
-	 */
+	
 	
 	public GuestGroup(Long id) {
 		super(id);
 		// TODO Auto-generated constructor stub
+		gStatus = GroupStatus.WELCOME;
 	}
 
 	private static final long serialVersionUID = 1L;
 	
 	private int groupSize;
+	private GroupStatus gStatus;
 
 	public Long getId() {
 		// TODO Auto-generated method stub
@@ -59,4 +59,10 @@ public class GuestGroup extends Person{
 		return true;
 	}
 	
+	public void setStatus(GroupStatus status){
+		this.gStatus = status;
+	}
+	public GroupStatus getStatus(){
+		return gStatus;
+	}
 }

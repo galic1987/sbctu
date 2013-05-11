@@ -9,6 +9,7 @@ public class Waiter extends Person{
 //			return super.toString().toLowerCase();
 //		}
 //	}
+	private WaiterStatus waiterStatus;
 	
 	/**
 	 * 
@@ -18,6 +19,7 @@ public class Waiter extends Person{
 	public Waiter(Long id) {
 		super(id);
 		// TODO Auto-generated constructor stub
+		waiterStatus = WaiterStatus.WAITING;
 	}
 	
 	public Long getId() {
@@ -68,6 +70,14 @@ public class Waiter extends Person{
 	public boolean doBillingForTable(Table table){
 		table.leaveTable();
 		return true;
+	}
+
+	public WaiterStatus getWaiterStatus() {
+		return waiterStatus;
+	}
+
+	public void setWaiterStatus(WaiterStatus waiterStatus) {
+		this.waiterStatus = waiterStatus;
 	}
 
 }

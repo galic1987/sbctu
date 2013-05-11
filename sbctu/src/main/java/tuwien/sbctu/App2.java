@@ -25,11 +25,14 @@ public class App2 {
         		// create a container
         		ContainerReference container = capi.createContainer();
         		// write an entry to the container
-        		capi.write(container, new Entry("Hello, space!"));
+        		capi.write(container, new Entry("Hello, space1!"));
+        		capi.write(container, new Entry("Hello, space!2"));
+        		capi.write(container, new Entry("Hello, space!2333"));
         		System.out.println("Entry written");
         		// read an entry from the container
         		ArrayList<String> resultEntries = capi.read(container);
         		System.out.println("Entry read: " + resultEntries.get(0));
+        		System.out.println("Entry read: " + resultEntries.get(1));
         		// destroy the container
         		//capi.destroyContainer(container, null);
         		// shutdown the core

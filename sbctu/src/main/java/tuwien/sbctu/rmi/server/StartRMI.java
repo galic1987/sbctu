@@ -1,0 +1,53 @@
+package tuwien.sbctu.rmi.server;
+
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+
+import tuwien.sbctu.rmi.RunWaiter;
+import tuwien.sbctu.rmi.implement.EntryImpl;
+import tuwien.sbctu.rmi.interfaces.IEntryRMI;
+
+public class StartRMI {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		String host = "localhost";	//args[0];
+		int RMIPort = 10879;		//args[1];
+		
+		startRMI(host, RMIPort);
+		System.out.println("========= SERVER started =========");
+		
+		//TODO start MULTIPLE WAITER
+		Thread waiter = new Thread(new RunWaiter(new Long(10), 10879, "entry"));
+		waiter.start();
+		
+		//TODO start MULTIPLE COOKS
+	}
+	
+	private static void startRMI(String host, Integer RMIPort){
+		IEntryRMI entryInterface = null;
+		
+		try {
+
+			entryInterface = new EntryImpl();
+			LocateRegistry.createRegistry(RMIPort);
+			Naming.rebind("rmi://" + host + ":" + RMIPort+  "/"+"entry", entryInterface);
+
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
+	
+}
