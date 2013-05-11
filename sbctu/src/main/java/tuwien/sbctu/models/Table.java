@@ -10,13 +10,19 @@ public class Table implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	public Table(){
+		setTabStat(TableStatus.FREE);
+	}
+	
+	private TableStatus tabStat;
 	private ArrayList<Order> orders;
 	private double bill;
 	private GuestGroup group;
 	private boolean requestBill;
+	
 	public boolean leaveTable(){
 		
-		orders = null;
+		setOrders(null);
 		bill = 0;
 		group = null;
 		requestBill = false;
@@ -30,4 +36,27 @@ public class Table implements Serializable{
 		return requestBill;
 	}	
 
+	public TableStatus getTabStat() {
+		return tabStat;
+	}
+
+	public void setTabStat(TableStatus tabStat) {
+		this.tabStat = tabStat;
+	}
+
+	public ArrayList<Order> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(ArrayList<Order> orders) {
+		this.orders = orders;
+	}
+
+	public enum TableStatus {
+	FREE, USED;
+	
+	public String toString(){
+		return super.toString().toLowerCase();
+	}
+}
 }

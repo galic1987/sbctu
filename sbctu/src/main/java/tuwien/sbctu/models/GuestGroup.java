@@ -1,6 +1,5 @@
 package tuwien.sbctu.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class GuestGroup extends Person{
@@ -64,5 +63,9 @@ public class GuestGroup extends Person{
 	}
 	public GroupStatus getStatus(){
 		return gStatus;
+	}
+	
+	public enum GroupStatus {
+		WELCOME, ENTERED, SITTING, ORDERED, EATING, FINISHED
 	}
 }
