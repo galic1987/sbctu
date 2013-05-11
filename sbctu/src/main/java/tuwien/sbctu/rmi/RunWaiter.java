@@ -53,6 +53,13 @@ public class RunWaiter implements Runnable{
 		
 		while(isActive){
 			work();
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -64,14 +71,14 @@ public class RunWaiter implements Runnable{
 		
 		case WELCOME: 			
 			beginWork(entry);
-			System.out.println();
+			System.out.println("-- Begin Working, Status:");
 			break;
 		case WAITING: 
-			System.out.println("Waiter: "+wi.getWaiter().getId() + ", is waiting for work.");
+//			System.out.println("Waiter: "+wi.getWaiter().getId() + ", is waiting for work.");
 			break;
 		case WORKING:
 			try {
-				Thread.sleep(24000);
+				Thread.sleep(12000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -117,15 +124,12 @@ public class RunWaiter implements Runnable{
 	
 	private void beginWork(IPizzeriaRMI entry){
 		try {
-			entry.waiterSubscribeCallback(iw);
-			wi.getWaiter().setWaiterStatus(WaiterStatus.WORKING);
+			entry.waiterEnteres(iw);
+			wi.getWaiter().setWaiterStatus(WaiterStatus.WAITING);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-//		ggi.getGuestGroup().setStatus(GroupStatus.ENTERED);
-		
+		}		
 	}
 	
 	//TODO getTable RMIInterface

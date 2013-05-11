@@ -24,7 +24,7 @@ public class Waiter extends Person{
 	
 	public Long getId() {
 		// TODO Auto-generated method stub
-		return null;
+		return super.getId();
 	}
 	
 	public Table areFreeTablesAvailable(){
@@ -72,7 +72,7 @@ public class Waiter extends Person{
 		return true;
 	}
 
-	public WaiterStatus getWaiterStatus() {
+	public synchronized WaiterStatus getWaiterStatus() {
 		return waiterStatus;
 	}
 
