@@ -23,8 +23,8 @@ public class StartRMI {
 		System.out.println("========= SERVER started =========");
 		
 		//TODO start MULTIPLE WAITER
-		Thread waiter = new Thread(new RunWaiter(new Long(10), 10879, "entry"));
-		waiter.start();
+//		Thread waiter = new Thread(new RunWaiter(new Long(10), 10879, "entry"));
+//		waiter.start();
 		
 		//TODO start MULTIPLE COOKS
 	}
@@ -36,7 +36,7 @@ public class StartRMI {
 
 			entryInterface = new PizzeriaImpl();
 			LocateRegistry.createRegistry(RMIPort);
-			Naming.rebind("rmi://" + host + ":" + RMIPort+  "/"+"entry", entryInterface);
+			Naming.rebind("rmi://" + host + ":" + RMIPort+  "/"+"pizzeria", entryInterface);
 
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block

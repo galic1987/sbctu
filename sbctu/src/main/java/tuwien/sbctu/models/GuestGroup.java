@@ -19,7 +19,7 @@ public class GuestGroup extends Person{
 
 	public Long getId() {
 		// TODO Auto-generated method stub
-		return null;
+		return super.getId();
 	}
 	
 	public boolean enterPizzeria(){

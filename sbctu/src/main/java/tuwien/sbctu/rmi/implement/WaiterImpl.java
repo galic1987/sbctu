@@ -40,15 +40,13 @@ public class WaiterImpl extends UnicastRemoteObject  implements IWaiterRMI{
 
 	@Override
 	public void entryNotify() throws RemoteException {
-		System.out.println("GUESTS ARE WAITING - Try handle request");
+		System.out.println("RMIServer: GUESTS ARE WAITING");
 		
-		//TODO LOOK if tables are free
+		if(waiter.getWaiterStatus() == WaiterStatus.WAITING)
+			bringGuestToTable();
+		else
+			System.out.println("I'm working!!");
 		
-		//TODO get table and assign group to table
-		IGuestGroupRMI igg = entry.getGuestGroup();
-		igg.tableNotify();
-		
-		System.out.println("Handled group table request.");
 	}
 
 	@Override
@@ -77,6 +75,31 @@ public class WaiterImpl extends UnicastRemoteObject  implements IWaiterRMI{
 		this.waiter = waiter;
 	}
 
-	
+	public void bringGuestToTable() throws RemoteException{
+		//TODO LOOK if tables are free
 
+		//TODO get table and assign group to table
+		IGuestGroupRMI igg = entry.getGuestGroup();
+
+		if(igg != null){
+			waiter.setWaiterStatus(WaiterStatus.WORKING);
+			igg.tableNotify();
+			try {
+				Thread.sleep(12000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Handled group table request.");
+			}
+		else
+			System.out.println("No group waiting.");
+		
+		waiter.setWaiterStatus(WaiterStatus.WAITING);
+	}
+
+	@Override
+	public WaiterStatus waiterStatus() throws RemoteException {
+		return waiter.getWaiterStatus();
+	}
 }

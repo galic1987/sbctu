@@ -37,4 +37,10 @@ public class GuestGroupImpl extends UnicastRemoteObject implements IGuestGroupRM
 		this.guestGroup = guestGroup;
 	}
 
+	@Override
+	public void successfullyOrdered() throws RemoteException {
+		// TODO Auto-generated method stub
+		guestGroup.setStatus(GroupStatus.ORDERED);
+	}
+
 }

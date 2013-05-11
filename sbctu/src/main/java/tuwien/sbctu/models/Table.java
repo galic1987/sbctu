@@ -15,6 +15,7 @@ public class Table implements Serializable{
 	}
 	
 	private TableStatus tabStat;
+	private Long groupID;
 	private ArrayList<Order> orders;
 	private double bill;
 	private GuestGroup group;
@@ -23,8 +24,8 @@ public class Table implements Serializable{
 	public boolean leaveTable(){
 		
 		setOrders(null);
-		bill = 0;
-		group = null;
+		setBill(0);
+		setGroup(null);
 		requestBill = false;
 		
 		return true;
@@ -50,6 +51,30 @@ public class Table implements Serializable{
 
 	public void setOrders(ArrayList<Order> orders) {
 		this.orders = orders;
+	}
+
+	public Long getGroupID() {
+		return groupID;
+	}
+
+	public void setGroupID(Long groupID) {
+		this.groupID = groupID;
+	}
+
+	public double getBill() {
+		return bill;
+	}
+
+	public void setBill(double bill) {
+		this.bill = bill;
+	}
+
+	public GuestGroup getGroup() {
+		return group;
+	}
+
+	public void setGroup(GuestGroup group) {
+		this.group = group;
 	}
 
 	public enum TableStatus {

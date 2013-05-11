@@ -68,14 +68,14 @@ public class RunGuestGroup implements Runnable{
 			break;
 		case ENTERED:
 			break;
-//		case SITTING:
-//			break;
-//		case ORDERED:
-//			break;
-//		case EATING:
-//			break;
-//		case FINISHED:
-//			break;
+		case SITTING:
+			break;
+		case ORDERED:			
+			break;
+		case EATING:
+			break;
+		case FINISHED:
+			break;
 		
 		default:
 			try {
@@ -128,7 +128,7 @@ public class RunGuestGroup implements Runnable{
 	private void enterPizzeria(IPizzeriaRMI entry){
 		try {
 			System.out.println("Entered GuestGroup - "+ggi.getGuestGroup().getId());
-			entry.addSingleGuestGroup(igg);
+			entry.guestGroupEnters(igg);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
