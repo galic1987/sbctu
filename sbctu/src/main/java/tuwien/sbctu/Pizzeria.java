@@ -14,7 +14,7 @@ import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
-
+import tuwien.sbctu.conf.*;
 
 import tuwien.sbctu.container.*;
 import tuwien.sbctu.models.*;
@@ -30,11 +30,7 @@ public class Pizzeria {
 	 */
 	
 	
-	private final static String LOCAL_SPACE_URI = "xvsm://localhost:9876";
-
-	private static final String CONTAINER_NAME_TABLES = "tables";
-	private static final String CONTAINER_NAME_BAR = "bar";
-	private static final String CONTAINER_NAME_ENTRANCE = "entrance";
+	
 	
 
 	private final MzsCore core;
@@ -58,19 +54,28 @@ public class Pizzeria {
 		capi = new Capi(core);
 
 		try {
-			space = new URI(LOCAL_SPACE_URI);
+			space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI);
 		} catch (final URISyntaxException e) {
 			throw new IllegalStateException(
 					"Unexpected state: Unparseable space URI="
-							+ LOCAL_SPACE_URI);
+							+ PizzeriaConfiguration.LOCAL_SPACE_URI);
 		}
 
 		manager = new NotificationManager(core);
 		
 		entranceContainer = new FifoContainerXvsm<>(capi, space,
-				CONTAINER_NAME_ENTRANCE);
-		tableContainer = new IdContainerXvsm(capi, space, CONTAINER_NAME_TABLES);
-		barContainer = new IdContainerXvsm(capi, space, CONTAINER_NAME_BAR);
+				PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE);
+		tableContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_TABLES);
+		barContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_BAR);
+	}
+	
+	
+	
+	public GuestGroup checkForNewGuests(){
+		
+		
+		
+		return null;
 	}
 	
 	
