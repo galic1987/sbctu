@@ -10,10 +10,12 @@ public class Table implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public Table(){
+	public Table(Long id){
 		setTabStat(TableStatus.FREE);
+		this.id = id;
 	}
 	
+	private Long id;
 	private TableStatus tabStat;
 	private Long groupID;
 	private ArrayList<Order> orders;
@@ -75,6 +77,14 @@ public class Table implements Serializable{
 
 	public void setGroup(GuestGroup group) {
 		this.group = group;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public enum TableStatus {
