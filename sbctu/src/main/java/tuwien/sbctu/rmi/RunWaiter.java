@@ -49,6 +49,7 @@ public class RunWaiter implements Runnable{
 		// TODO Auto-generated method stub
 		entry = getEntry(port, bindingName);
 		System.out.println("-- WAITER STARTED -- " + wi.getWaiter().getId() );
+		
 		wi.setEntry(entry);
 		
 		while(isActive){
@@ -71,7 +72,7 @@ public class RunWaiter implements Runnable{
 		
 		case WELCOME: 			
 			beginWork(entry);
-			System.out.println("-- Begin Working, Status:");
+			System.out.println("-- Begin Working. --");
 			break;
 		case WAITING: 
 //			System.out.println("Waiter: "+wi.getWaiter().getId() + ", is waiting for work.");
@@ -83,7 +84,8 @@ public class RunWaiter implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			break;		
+			break;	
+			
 		default:
 			try {
 				Thread.sleep(6000);

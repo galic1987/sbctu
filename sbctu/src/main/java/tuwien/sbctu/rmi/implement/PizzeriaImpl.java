@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import tuwien.sbctu.models.Order;
 import tuwien.sbctu.models.Table;
+import tuwien.sbctu.models.Table.TableStatus;
 import tuwien.sbctu.models.Waiter.WaiterStatus;
 import tuwien.sbctu.rmi.interfaces.ICookRMI;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
@@ -29,9 +30,14 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 
 	private static final long serialVersionUID = 1L;
 
-	public PizzeriaImpl() throws RemoteException {
+	public PizzeriaImpl(Integer tableSize) throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
+		for(int i = 1; i <= tableSize; i++){
+			Long tabId = Long.valueOf(i);
+			tableList.add(new Table(tabId));
+			System.out.println("* Created table, id: "+i);
+		}
 	}
 
 	@Override
@@ -87,15 +93,27 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	}
 
 	@Override
-	public void isTableFree() throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public synchronized Table isTableFree() throws RemoteException {
+		Table freeTab = null;
+		for(Table tab : tableList){
+			if(tab.getTabStat() == TableStatus.FREE){
+				freeTab = tab;
+				tab.setTabStat(TableStatus.USED);
+				System.out.println("Free Table found: "+tab.getId());
+				break;
+			}				
+		}
+		return freeTab;
 	}
 
 	@Override
-	public void isBillRequested() throws RemoteException {
+	public Order isBillRequested() throws RemoteException {
 		// TODO Auto-generated method stub
-		
+		Order finishedOrder = null;
+//		for(Order order : orderList){
+//			if(order)
+//		}			
+		return finishedOrder;
 	}
 
 }

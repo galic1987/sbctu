@@ -17,8 +17,9 @@ public class RunGuestGroup implements Runnable{
 	
 	private int port;
 	private String bindingName;
+	private Long groupid;
 	
-	private GuestGroupImpl ggi;
+//	private static GuestGroupImpl ggi;
 	private IGuestGroupRMI igg;
 	
 	private IPizzeriaRMI entry;
@@ -37,38 +38,52 @@ public class RunGuestGroup implements Runnable{
 		this.bindingName = bindingName;
 		
 		try {
-			ggi = new GuestGroupImpl(id);
+			igg = new GuestGroupImpl(id);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		igg = ggi;
+//		igg = ggi;
 		
 	}
 	
 	@Override
 	public void run() {
-		System.out.println("Started GuestGroup - "+ggi.getGuestGroup().getId());
+		
+		try {
+			groupid = igg.getGroupId();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		System.out.println("Started GuestGroup - "+ groupid);
 		entry = getEntry(port, bindingName);
 		
-		while(isActive){
-			work();			
+		while(isActive){			
+			try {
+				work(igg.getGroupStatus());
+				Thread.sleep(1000);
+			} catch (InterruptedException | RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public void work(){
-		
-		GroupStatus gs = ggi.getGuestGroup().getStatus();
-		
+	public void work(GroupStatus gs) throws RemoteException{
 		switch(gs){
 		
 		case WELCOME:
-			System.out.println("Welcome GuestGroup - "+ggi.getGuestGroup().getId()); 
+			System.out.println("Welcome GuestGroup - "+ groupid); 
 			enterPizzeria(entry);
 			break;
 		case ENTERED:
+			System.out.println("Entered");
 			break;
 		case SITTING:
+			System.out.println("Sitting");
+//			entry.makeOrder(group);
 			break;
 		case ORDERED:			
 			break;
@@ -127,14 +142,15 @@ public class RunGuestGroup implements Runnable{
 	 */
 	private void enterPizzeria(IPizzeriaRMI entry){
 		try {
-			System.out.println("Entered GuestGroup - "+ggi.getGuestGroup().getId());
+			System.out.println("Entered GuestGroup - "+ groupid);
 			entry.guestGroupEnters(igg);
+			igg.setGroupStatus(GroupStatus.ENTERED);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		ggi.getGuestGroup().setStatus(GroupStatus.ENTERED);
+//		ggi.getGuestGroup().setStatus(GroupStatus.ENTERED);
 		
 	}
 

@@ -3,6 +3,9 @@ package tuwien.sbctu.rmi.implement;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import tuwien.sbctu.models.Table;
+import tuwien.sbctu.models.GuestGroup.GroupStatus;
+import tuwien.sbctu.models.Table.TableStatus;
 import tuwien.sbctu.models.Waiter;
 import tuwien.sbctu.models.Waiter.WaiterStatus;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
@@ -52,6 +55,10 @@ public class WaiterImpl extends UnicastRemoteObject  implements IWaiterRMI{
 	@Override
 	public void orderNotify() throws RemoteException {
 		// TODO Auto-generated method stub
+//		if(waiter.getWaiterStatus() == WaiterStatus.WAITING)
+//			handleOrder();
+//		else
+//			System.out.println("I'm working!!");
 		
 	}
 
@@ -77,23 +84,34 @@ public class WaiterImpl extends UnicastRemoteObject  implements IWaiterRMI{
 
 	public void bringGuestToTable() throws RemoteException{
 		//TODO LOOK if tables are free
+		Table table = entry.isTableFree();
+		if(table != null)
+		{
+			//TODO get table and assign group to table
+			IGuestGroupRMI igg = entry.getGuestGroup();
 
-		//TODO get table and assign group to table
-		IGuestGroupRMI igg = entry.getGuestGroup();
-
-		if(igg != null){
-			waiter.setWaiterStatus(WaiterStatus.WORKING);
-			igg.tableNotify();
-			try {
-				Thread.sleep(12000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(igg != null){
+				waiter.setWaiterStatus(WaiterStatus.WORKING);
+				table.setGroupID(igg.getGroupId());
+				igg.tableNotify();
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				igg.setGroupStatus(GroupStatus.SITTING);
+				System.out.println("Group: "+igg.getGroupId()+" Status: "+igg.getGroupStatus()+" is sitting on table: "+table.getId());	
 			}
-			System.out.println("Handled group table request.");
+			else{
+				System.out.println("No guests waiting anymore.");
+				if(table.getGroupID() != null)
+					table.setTabStat(TableStatus.FREE);
 			}
+		}
 		else
-			System.out.println("No group waiting.");
+			System.out.println("Wait for free tables.");
 		
 		waiter.setWaiterStatus(WaiterStatus.WAITING);
 	}

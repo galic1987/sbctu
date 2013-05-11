@@ -11,6 +11,7 @@ import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 
 public class StartRMI {
 
+	
 	/**
 	 * @param args
 	 */
@@ -34,7 +35,7 @@ public class StartRMI {
 		
 		try {
 
-			entryInterface = new PizzeriaImpl();
+			entryInterface = new PizzeriaImpl(4);
 			LocateRegistry.createRegistry(RMIPort);
 			Naming.rebind("rmi://" + host + ":" + RMIPort+  "/"+"pizzeria", entryInterface);
 
