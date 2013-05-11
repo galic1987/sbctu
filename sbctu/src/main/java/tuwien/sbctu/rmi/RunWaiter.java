@@ -6,10 +6,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import tuwien.sbctu.models.Waiter;
-import tuwien.sbctu.models.WaiterStatus;
+import tuwien.sbctu.models.Waiter.WaiterStatus;
 import tuwien.sbctu.rmi.implement.WaiterImpl;
-import tuwien.sbctu.rmi.interfaces.IEntryRMI;
+import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
 
 public class RunWaiter implements Runnable{
@@ -18,11 +17,12 @@ public class RunWaiter implements Runnable{
 	private int port;
 	private String bindingName;
 	
-	private Waiter waiter;
+//	private Waiter waiter;
+	
 	private IWaiterRMI iw;
 	private WaiterImpl wi;
 	
-	private IEntryRMI entry;
+	private IPizzeriaRMI entry;
 	
 	/**
 	 * 
@@ -33,21 +33,23 @@ public class RunWaiter implements Runnable{
 		this.port = port;
 		this.bindingName = bindingName;
 		
-		this.waiter = new Waiter(id);
+//		this.waiter = new Waiter(id);
 		
 		try {
-			wi = new WaiterImpl();
+			wi = new WaiterImpl(id);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		iw = wi;
 	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		entry = getEntry(port, bindingName);
-		System.out.println("-- WAITER STARTED --" + waiter.getId() );
+		System.out.println("-- WAITER STARTED -- " + wi.getWaiter().getId() );
+		wi.setEntry(entry);
 		
 		while(isActive){
 			work();
@@ -56,13 +58,16 @@ public class RunWaiter implements Runnable{
 	
 	public void work(){
 		
-		WaiterStatus ws = waiter.getWaiterStatus();
+		WaiterStatus ws = wi.getWaiter().getWaiterStatus();
 		
 		switch(ws){
 		
+		case WELCOME: 			
+			beginWork(entry);
+			System.out.println();
+			break;
 		case WAITING: 
-			
-			enterPizzeria(entry);
+			System.out.println("Waiter: "+wi.getWaiter().getId() + ", is waiting for work.");
 			break;
 		case WORKING:
 			try {
@@ -86,7 +91,7 @@ public class RunWaiter implements Runnable{
 		
 	}
 	
-	private IEntryRMI getEntry(Integer port, String bindingName){
+	private IPizzeriaRMI getEntry(Integer port, String bindingName){
 		Registry registry = null;
 
 		try {
@@ -95,10 +100,10 @@ public class RunWaiter implements Runnable{
 			e1.printStackTrace();
 		}
 
-		IEntryRMI entry = null;
+		IPizzeriaRMI entry = null;
 
 		try {
-			entry = (IEntryRMI) registry.lookup(bindingName);
+			entry = (IPizzeriaRMI) registry.lookup(bindingName);
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		} catch (AccessException e) {
@@ -110,10 +115,10 @@ public class RunWaiter implements Runnable{
 		return entry;
 	}
 	
-	private void enterPizzeria(IEntryRMI entry){
+	private void beginWork(IPizzeriaRMI entry){
 		try {
 			entry.waiterSubscribeCallback(iw);
-			waiter.setWaiterStatus(WaiterStatus.WORKING);
+			wi.getWaiter().setWaiterStatus(WaiterStatus.WORKING);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

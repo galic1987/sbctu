@@ -6,8 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
 import tuwien.sbctu.rmi.RunWaiter;
-import tuwien.sbctu.rmi.implement.EntryImpl;
-import tuwien.sbctu.rmi.interfaces.IEntryRMI;
+import tuwien.sbctu.rmi.implement.PizzeriaImpl;
+import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 
 public class StartRMI {
 
@@ -30,11 +30,11 @@ public class StartRMI {
 	}
 	
 	private static void startRMI(String host, Integer RMIPort){
-		IEntryRMI entryInterface = null;
+		IPizzeriaRMI entryInterface = null;
 		
 		try {
 
-			entryInterface = new EntryImpl();
+			entryInterface = new PizzeriaImpl();
 			LocateRegistry.createRegistry(RMIPort);
 			Naming.rebind("rmi://" + host + ":" + RMIPort+  "/"+"entry", entryInterface);
 

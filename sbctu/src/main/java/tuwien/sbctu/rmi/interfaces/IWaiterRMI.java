@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 
 public interface IWaiterRMI extends Remote{
 	
+	public void beginWork() throws RemoteException;
 	public void entryNotify() throws RemoteException;
 	public void orderNotify() throws RemoteException;
 	public void billNotifiy() throws RemoteException;

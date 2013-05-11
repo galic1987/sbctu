@@ -19,7 +19,7 @@ public class Waiter extends Person{
 	public Waiter(Long id) {
 		super(id);
 		// TODO Auto-generated constructor stub
-		waiterStatus = WaiterStatus.WAITING;
+		waiterStatus = WaiterStatus.WELCOME;
 	}
 	
 	public Long getId() {
@@ -78,6 +78,10 @@ public class Waiter extends Person{
 
 	public void setWaiterStatus(WaiterStatus waiterStatus) {
 		this.waiterStatus = waiterStatus;
+	}
+	
+	public enum WaiterStatus {
+		WELCOME, WAITING, WORKING
 	}
 
 }

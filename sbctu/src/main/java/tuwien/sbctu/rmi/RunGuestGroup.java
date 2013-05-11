@@ -6,10 +6,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import tuwien.sbctu.models.GroupStatus;
+import tuwien.sbctu.models.GuestGroup.GroupStatus;
 import tuwien.sbctu.rmi.implement.GuestGroupImpl;
-import tuwien.sbctu.rmi.interfaces.IEntryRMI;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
+import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 
 public class RunGuestGroup implements Runnable{
 
@@ -21,7 +21,7 @@ public class RunGuestGroup implements Runnable{
 	private GuestGroupImpl ggi;
 	private IGuestGroupRMI igg;
 	
-	private IEntryRMI entry;
+	private IPizzeriaRMI entry;
 	
 	/**
 	 * 
@@ -62,12 +62,12 @@ public class RunGuestGroup implements Runnable{
 		
 		switch(gs){
 		
-		case WELCOME: 
-			System.out.println("Entering GuestGroup - "+ggi.getGuestGroup().getId());
+		case WELCOME:
+			System.out.println("Welcome GuestGroup - "+ggi.getGuestGroup().getId()); 
 			enterPizzeria(entry);
 			break;
-//		case ENTERED:
-//			break;
+		case ENTERED:
+			break;
 //		case SITTING:
 //			break;
 //		case ORDERED:
@@ -97,7 +97,7 @@ public class RunGuestGroup implements Runnable{
 	 * @param bindingName
 	 * @return
 	 */
-	private IEntryRMI getEntry(Integer port, String bindingName){
+	private IPizzeriaRMI getEntry(Integer port, String bindingName){
 		Registry registry = null;
 
 		try {
@@ -106,10 +106,10 @@ public class RunGuestGroup implements Runnable{
 			e1.printStackTrace();
 		}
 
-		IEntryRMI entry = null;
+		IPizzeriaRMI entry = null;
 
 		try {
-			entry = (IEntryRMI) registry.lookup(bindingName);
+			entry = (IPizzeriaRMI) registry.lookup(bindingName);
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		} catch (AccessException e) {
@@ -125,12 +125,10 @@ public class RunGuestGroup implements Runnable{
 	 * 
 	 * @param entry
 	 */
-	private void enterPizzeria(IEntryRMI entry){
+	private void enterPizzeria(IPizzeriaRMI entry){
 		try {
-			
-			entry.addSingleGuestGroup(ggi.getGuestGroup());
-			entry.groupSubscribeCallback(igg);
 			System.out.println("Entered GuestGroup - "+ggi.getGuestGroup().getId());
+			entry.addSingleGuestGroup(igg);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

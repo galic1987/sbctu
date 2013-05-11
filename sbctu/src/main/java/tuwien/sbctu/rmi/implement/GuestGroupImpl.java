@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.GuestGroup.GroupStatus;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
 
 public class GuestGroupImpl extends UnicastRemoteObject implements IGuestGroupRMI{
@@ -17,8 +18,9 @@ public class GuestGroupImpl extends UnicastRemoteObject implements IGuestGroupRM
 	
 	@Override
 	public void tableNotify() throws RemoteException {
-		System.out.println("We have found a table for you.");
-		
+		guestGroup.setStatus(GroupStatus.SITTING);
+
+		System.out.println("We have found a table for you. GroupStatus - "+guestGroup.getStatus());
 	}
 
 	@Override
