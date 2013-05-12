@@ -171,7 +171,7 @@ public class RunWaiter implements Runnable{
 			Table tab = null;
 			tab = pizzeriaRMI.getTableWithId(tabid);
 			if(tab != null){
-				tab.addOrders(ord);
+				tab.setOrder(ord);
 				pizzeriaRMI.putTableBack(tab);
 			}
 		}
@@ -186,13 +186,13 @@ public class RunWaiter implements Runnable{
 		Table tab = pizzeriaRMI.getUsedTableWithStatus(TableStatus.PAY);
 		double bill = 0.0;
 		System.out.println("processBill for table:"+tab.getId());
-		for(Order o : tab.getOrders()){
-			System.out.println("* Order:"+o.getId());
+		Order o = tab.getOrder();
+		System.out.println("* Order:"+o.getId());
 			for(Pizza p : o.getPizzaList()){
 				System.out.println(" ** Pizza:"+p.getName());
 				bill += p.getPrice();
 			}
-		}
+		
 		tab.setBill(bill);
 		pizzeriaRMI.putTableBill(tab);
 		

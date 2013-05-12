@@ -157,7 +157,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			{
 				result = t;
 				it.remove();
-				System.out.println("Table: "+t.getId()+" is ready for paying. Order size:"+t.getOrders().size());
+				System.out.println("Table: "+t.getId()+" is ready for paying.");
 				break;
 			}
 			else
@@ -393,7 +393,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			while(it.hasNext()){
 				Table t = (Table) it.next();
 				if (t.getGroupID().equals(groupId)){
-					t.reset();
+					t.leaveTable();
 					freeTable = t;
 					it.remove();
 				}

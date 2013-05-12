@@ -1,7 +1,6 @@
 package tuwien.sbctu.models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Table implements Serializable{
 
@@ -13,20 +12,20 @@ public class Table implements Serializable{
 	public Table(Long id){
 		setTabStat(TableStatus.FREE);
 		this.id = id;
-		orders = new ArrayList<Order>();
+		order = null;
 	}
 	
 	private Long id;
 	private TableStatus tabStat;
 	private Long groupID;
-	private ArrayList<Order> orders;
+	private Order order;
 	private double bill;
 	private GuestGroup group;
 	private boolean requestBill;
 	
 	public boolean leaveTable(){
 		
-		setOrders(null);
+		setOrder(null);
 		setBill(0);
 		setGroup(null);
 		requestBill = false;
@@ -48,18 +47,6 @@ public class Table implements Serializable{
 
 	public void setTabStat(TableStatus tabStat) {
 		this.tabStat = tabStat;
-	}
-
-	public ArrayList<Order> getOrders() {
-		return orders;
-	}
-
-	public void setOrders(ArrayList<Order> orders) {
-		this.orders = orders;
-	}
-	
-	public void addOrders(Order orders) {
-		this.orders.add(orders);
 	}
 
 	public Long getGroupID() {
@@ -93,16 +80,13 @@ public class Table implements Serializable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	public void reset(){
-		
-		tabStat = TableStatus.FREE;
-		groupID = null;
-		orders = new ArrayList<Order>();
-		bill = 0.00;
-		group = null;
-		requestBill = false;
-		
+
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 	public enum TableStatus {
