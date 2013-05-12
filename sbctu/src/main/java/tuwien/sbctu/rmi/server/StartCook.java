@@ -1,8 +1,8 @@
 package tuwien.sbctu.rmi.server;
 
-import tuwien.sbctu.rmi.RunGuestGroup;
+import tuwien.sbctu.rmi.RunCook;
 
-public class StartGuestGroup {
+public class StartCook {
 
 	/**
 	 * @param args
@@ -10,10 +10,9 @@ public class StartGuestGroup {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Long id = new Long (Long.valueOf(args[0]));
-		int size = Integer.valueOf(args[3]);
 		Integer port = Integer.valueOf(args[1]);
 		
-		Thread group = new Thread(new RunGuestGroup( id, port, args[2], size));
+		Thread group = new Thread(new RunCook( id, port, args[2]));
 		group.start();
 	}
 

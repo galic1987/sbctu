@@ -10,6 +10,11 @@ public class Order implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private Long id;
+	
+	private Long groupID;
+	private Long tableID;
+	
 	private ArrayList<Pizza> pizzaList;
 	private OrderStatus orderstatus;
 	private Long waiterTableAssigmentId;
@@ -18,18 +23,15 @@ public class Order implements Serializable{
 	private Long waiterBillProcessedId;
 	
 	
+	
+	
 	public enum OrderStatus {
-		ORDERED, SERVING,PAID;
+		ORDERED, PROCESSING, COOKED, SERVING, PAID;
 		
 		public String toString(){
 			return super.toString().toLowerCase();
 		}
 	} 
-	
-	
-	
-	
-	
 	public Long getWaiterTableAssigmentId() {
 		return waiterTableAssigmentId;
 	}
@@ -82,6 +84,30 @@ public class Order implements Serializable{
 
 	public void setOrderstatus(OrderStatus orderstatus) {
 		this.orderstatus = orderstatus;
+	}
+
+	public Long getGroupID() {
+		return groupID;
+	}
+
+	public void setGroupID(Long groupID) {
+		this.groupID = groupID;
+	}
+
+	public Long getTableID() {
+		return tableID;
+	}
+
+	public void setTableID(Long tableID) {
+		this.tableID = tableID;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 }

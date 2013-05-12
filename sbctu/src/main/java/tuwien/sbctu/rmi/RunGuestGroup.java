@@ -6,7 +6,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
+import tuwien.sbctu.models.Menue;
+import tuwien.sbctu.models.Menue.MenuePizza;
+import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Order.OrderStatus;
+import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.rmi.implement.GuestGroupImpl;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
 import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
@@ -17,12 +23,12 @@ public class RunGuestGroup implements Runnable{
 	
 	private int port;
 	private String bindingName;
-	private Long groupid;
 	
-//	private static GuestGroupImpl ggi;
+	private Long groupid;
+	private GuestGroup guestGroup;
 	private IGuestGroupRMI igg;
 	
-	private IPizzeriaRMI entry;
+	private IPizzeriaRMI pizzeriaRMI;
 	
 	/**
 	 * 
@@ -30,73 +36,84 @@ public class RunGuestGroup implements Runnable{
 	 * @param port
 	 * @param bindingName
 	 */
-	public RunGuestGroup(Long id, Integer port, String bindingName){
-		
+	public RunGuestGroup(Long id, Integer port, String bindingName, int size){
 		isActive = true;
-
+		this.groupid = id;
 		this.port = port;
 		this.bindingName = bindingName;
 		
+		guestGroup = new GuestGroup(groupid);
+		guestGroup.setGroupSize(size);
+		
+
 		try {
-			igg = new GuestGroupImpl(id);
+			igg = new GuestGroupImpl(groupid);	
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-//		igg = ggi;
-		
+		}		
 	}
 	
 	@Override
 	public void run() {
 		
-		try {
-			groupid = igg.getGroupId();
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
 		System.out.println("Started GuestGroup - "+ groupid);
-		entry = getEntry(port, bindingName);
+		pizzeriaRMI = getEntry(port, bindingName);
+		enterPizzeria(pizzeriaRMI);
 		
 		while(isActive){			
 			try {
-				work(igg.getGroupStatus());
+				work();
 				Thread.sleep(1000);
 			} catch (InterruptedException | RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Going home ...");
+		
+		System.exit(0);
 	}
 	
-	public void work(GroupStatus gs) throws RemoteException{
+	public void work() throws RemoteException{
+		
+		GroupStatus gs = igg.getStatus();
+				
 		switch(gs){
 		
-		case WELCOME:
-			System.out.println("Welcome GuestGroup - "+ groupid); 
-			enterPizzeria(entry);
-			break;
 		case ENTERED:
-			System.out.println("Entered");
 			break;
 		case SITTING:
-			System.out.println("Sitting");
-//			entry.makeOrder(group);
+			makeOrder();
 			break;
-		case ORDERED:			
+		case ORDERED:
+			
 			break;
 		case EATING:
+			int random = (1 + (int)(Math.random() * ((5 - 1) + 1))) -1;
+			System.out.println("Yuummi yummi, eating this takes "+random+" seconds ... i know its fast ;)");
+			try {
+				Thread.sleep(random*1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			igg.setStatus(GroupStatus.FINISHED);
+			
+			pizzeriaRMI.requestBill(guestGroup.getId());
 			break;
 		case FINISHED:
+			break;
+		case BILL:
+			System.out.println("Thanks for the delicious meal.");
+			pizzeriaRMI.payBillNLeave(guestGroup.getId());
+			isActive = false;
 			break;
 		
 		default:
 			try {
 				Thread.sleep(1000);
+				enterPizzeria(pizzeriaRMI);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -104,6 +121,44 @@ public class RunGuestGroup implements Runnable{
 			
 		}
 		
+	}
+	
+	/**
+	 * 
+	 * @param entry
+	 */
+	private void enterPizzeria(IPizzeriaRMI entry){
+		try {
+			entry.guestGroupEnters(guestGroup, igg);
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	private void makeOrder() throws RemoteException{
+		int groupCount = guestGroup.getGroupSize();
+		Order order = new Order();
+		while(groupCount>0){
+			Long ogid = igg.getId();
+			System.out.println("group id "+ogid+" for order.");
+			Menue menue = new Menue();
+			MenuePizza mp = menue.selectPizza();
+			
+			Pizza p = new Pizza(
+					mp.toString(),
+					menue.getPricesFor(mp),
+					menue.getTimeFor(mp) );
+		
+			order.setId((groupid*100)+groupCount);
+			order.addPizzaToOrder(p);
+			order.setGroupID(ogid);
+			order.setOrderstatus(OrderStatus.ORDERED);
+			groupCount--;
+		}
+	
+			pizzeriaRMI.makeOrder(order);
+			igg.setStatus(GroupStatus.ORDERED);
 	}
 	
 	/**
@@ -135,23 +190,4 @@ public class RunGuestGroup implements Runnable{
 
 		return entry;
 	}
-	
-	/**
-	 * 
-	 * @param entry
-	 */
-	private void enterPizzeria(IPizzeriaRMI entry){
-		try {
-			System.out.println("Entered GuestGroup - "+ groupid);
-			entry.guestGroupEnters(igg);
-			igg.setGroupStatus(GroupStatus.ENTERED);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-//		ggi.getGuestGroup().setStatus(GroupStatus.ENTERED);
-		
-	}
-
 }
