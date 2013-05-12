@@ -135,7 +135,7 @@ public class RunGuestSBC implements NotificationListener {
 	        	 
 	        	 if(g.getStatus().equals(GroupStatus.EATING)){
 	        		 g.eatPizzaNotDishes();
-	        		 g.setStatus(GroupStatus.BRINGMEBILL);
+	        		 g.setStatus(GroupStatus.BILL);
 	        		 
 	        		 try {
 							capi.write(tables, new Entry(g));
