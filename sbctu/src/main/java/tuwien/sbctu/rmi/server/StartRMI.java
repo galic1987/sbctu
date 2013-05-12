@@ -5,7 +5,6 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
-import tuwien.sbctu.rmi.RunWaiter;
 import tuwien.sbctu.rmi.implement.PizzeriaImpl;
 import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 

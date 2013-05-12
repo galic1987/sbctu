@@ -65,7 +65,15 @@ public class GuestGroup extends Person{
 		return gStatus;
 	}
 	
+	public int getGroupSize() {
+		return groupSize;
+	}
+
+	public void setGroupSize(int groupSize) {
+		this.groupSize = groupSize;
+	}
+
 	public enum GroupStatus {
-		WELCOME, ENTERED, SITTING, ORDERED, EATING, FINISHED
+		WELCOME, ENTERED, SITTING, ORDERED, EATING, FINISHED, BILL
 	}
 }

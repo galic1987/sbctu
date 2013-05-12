@@ -1,7 +1,14 @@
 package tuwien.sbctu.models;
 
-public class Pizza {
+import java.io.Serializable;
 
+public class Pizza implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private double price;
 	private int prepareTime;
@@ -21,6 +28,7 @@ public class Pizza {
 		this.name = name;
 		this.price = price;
 		this.prepareTime = time;
+		status = PizzaStatus.ORDERED;
 	}
 	
 	public String getName() {

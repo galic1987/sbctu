@@ -2,6 +2,14 @@ package tuwien.sbctu.models;
 
 public class Cook extends Person{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public enum CookStatus{
+		WAITING, WORKING;
+	}
 	public Cook(Long id) {
 		super(id);
 		// TODO Auto-generated constructor stub

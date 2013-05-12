@@ -6,7 +6,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import tuwien.sbctu.models.Waiter.WaiterStatus;
+import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Order.OrderStatus;
+import tuwien.sbctu.models.Pizza;
+import tuwien.sbctu.models.Table;
+import tuwien.sbctu.models.Table.TableStatus;
+import tuwien.sbctu.models.Waiter;
 import tuwien.sbctu.rmi.implement.WaiterImpl;
 import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
@@ -17,12 +23,12 @@ public class RunWaiter implements Runnable{
 	private int port;
 	private String bindingName;
 	
-//	private Waiter waiter;
+	private Waiter waiter;
 	
 	private IWaiterRMI iw;
 	private WaiterImpl wi;
 	
-	private IPizzeriaRMI entry;
+	private IPizzeriaRMI pizzeriaRMI;
 	
 	/**
 	 * 
@@ -33,7 +39,7 @@ public class RunWaiter implements Runnable{
 		this.port = port;
 		this.bindingName = bindingName;
 		
-//		this.waiter = new Waiter(id);
+		this.waiter = new Waiter(id);
 		
 		try {
 			wi = new WaiterImpl(id);
@@ -47,44 +53,45 @@ public class RunWaiter implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		entry = getEntry(port, bindingName);
-		System.out.println("-- WAITER STARTED -- " + wi.getWaiter().getId() );
-		
-		wi.setEntry(entry);
+		pizzeriaRMI = getEntry(port, bindingName);
+		beginWork(pizzeriaRMI);
 		
 		while(isActive){
-			work();
 			
 			try {
+				work();
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void work(){
+	public void work()throws RemoteException{
 		
-		WaiterStatus ws = wi.getWaiter().getWaiterStatus();
-		
+		int ws = iw.getStatus();
+
 		switch(ws){
-		
-		case WELCOME: 			
-			beginWork(entry);
-			System.out.println("-- Begin Working. --");
+
+		case 0:
+//			lookForWork();
 			break;
-		case WAITING: 
-//			System.out.println("Waiter: "+wi.getWaiter().getId() + ", is waiting for work.");
+		case 1:
+			bringToTable();
 			break;
-		case WORKING:
-			try {
-				Thread.sleep(12000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;	
+		case 2:
+			processNewOrder();
+			break;
+		case 3:
+			serveOrder();
+			break;
+		case 4:
+			processBill();
+			break;
 			
 		default:
 			try {
@@ -100,6 +107,98 @@ public class RunWaiter implements Runnable{
 		
 	}
 	
+	private void beginWork(IPizzeriaRMI entry){
+		try {
+			entry.waiterEnteres(waiter, iw);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	private void bringToTable() throws RemoteException{
+		GuestGroup gg =	pizzeriaRMI.getFromEntry();
+
+		if(gg != null){
+			Table table = pizzeriaRMI.getTableWithStatus(TableStatus.FREE);
+			if(table!= null){
+				pizzeriaRMI.sitdownGuestGroup(gg, table);
+				System.out.println("Served group "+gg.getId());
+			}
+			else{
+				pizzeriaRMI.returnToEntry(gg);
+				System.out.println("All tables idle, Group has to wait again.");
+			}
+		}	
+		else
+			System.out.println("Group is being served by others.");
+		
+		iw.setStatus(0);
+	}
+	
+	private void processNewOrder() throws RemoteException{
+		System.out.println("processNewOrder");
+		
+			Order order = pizzeriaRMI.isOrderWaiting();	
+			Long tableID = null;
+			try{
+				
+				tableID = pizzeriaRMI.getTableForGroupID(order.getGroupID());
+				System.out.println("Order:"+order.getId()+" for table:"+tableID+" recieved.");
+			} catch (NullPointerException e){
+				iw.setStatus(0);
+			}
+			if(tableID != null){
+				order.setTableID(tableID);
+				order.setWaiterTableAssigmentId(tableID);
+				order.setOrderstatus(OrderStatus.PROCESSING);
+				order.setWaiterOrderTookId(iw.getId());
+				pizzeriaRMI.putNewOrderToBar(order);			
+			}
+			
+			System.out.println("..waiting to do more work ...");
+			iw.setStatus(0);
+		
+	}
+	
+	private void serveOrder() throws RemoteException{
+		Order ord = pizzeriaRMI.isOrderReady();
+		
+		if(ord != null){
+			System.out.println("Serving order: "+ord.getId());
+//			Long grid = ord.getGroupID();
+			Long tabid = ord.getTableID();
+			
+			Table tab = null;
+			tab = pizzeriaRMI.getTableWithId(tabid);
+			if(tab != null){
+				tab.addOrders(ord);
+				pizzeriaRMI.putTableBack(tab);
+			}
+		}
+		else
+			System.out.println("Order already serving by others.");
+		
+		System.out.println("..waiting to do more work ...");
+		iw.setStatus(0);
+	}
+	
+	private void processBill() throws RemoteException{
+		Table tab = pizzeriaRMI.getUsedTableWithStatus(TableStatus.PAY);
+		double bill = 0.0;
+		System.out.println("processBill for table:"+tab.getId());
+		for(Order o : tab.getOrders()){
+			System.out.println("* Order:"+o.getId());
+			for(Pizza p : o.getPizzaList()){
+				System.out.println(" ** Pizza:"+p.getName());
+				bill += p.getPrice();
+			}
+		}
+		tab.setBill(bill);
+		pizzeriaRMI.putTableBill(tab);
+		
+		System.out.println("..waiting to do more work ...");
+		iw.setStatus(0);
+	}
 	private IPizzeriaRMI getEntry(Integer port, String bindingName){
 		Registry registry = null;
 
@@ -123,19 +222,4 @@ public class RunWaiter implements Runnable{
 
 		return entry;
 	}
-	
-	private void beginWork(IPizzeriaRMI entry){
-		try {
-			entry.waiterEnteres(iw);
-			wi.getWaiter().setWaiterStatus(WaiterStatus.WAITING);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
-	
-	//TODO getTable RMIInterface
-	
-	//TODO getTheke RMIInterface
-
 }
