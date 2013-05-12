@@ -33,6 +33,13 @@ Start core:
 mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server"
 
 
+====== RMI =======
+Parameters needed to start ..
+
+StartWaiter: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> -  i.e. 1 10879 pizzeria
+StartCook: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> -  i.e. 1 10879 pizzeria
+StartGuestGroup: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> <groupSize> - i.e. 1 10879 pizzeria 1
+
 
 
 
