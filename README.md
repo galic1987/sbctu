@@ -49,9 +49,8 @@ RMI server on localhost port 10879 will be started automatically on RMI-bindingN
 1. start "StartRMI.java" (no arguments)
 2. start "StartGUI.java" (no arguments)
 3. start "StartWaiter.java" arguments: -waiterID -rmiPort -bindingName (i.e. 1 10879 pizzeria)
-or
-3. start "StartCook.java" arguments: -cookID -rmiPort -bindingName (i.e. 2 10879 pizzeria)
-4. guests can be started from the gui
+4. start "StartCook.java" arguments: -cookID -rmiPort -bindingName (i.e. 2 10879 pizzeria)
+5. guests can be started from the gui
 
 
 
