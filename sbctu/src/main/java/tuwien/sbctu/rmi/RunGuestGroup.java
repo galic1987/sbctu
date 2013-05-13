@@ -71,7 +71,7 @@ public class RunGuestGroup implements Runnable{
 		}
 		System.out.println("Going home ...");
 		
-		System.exit(0);
+//		System.exit(0);
 	}
 	
 	public void work() throws RemoteException{

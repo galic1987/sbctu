@@ -214,8 +214,9 @@ public class RunWaiter implements Runnable{
 //			iw.setStatus(4);
 //		else if(pizzeriaRMI.todoBar())
 //			iw.setStatus(3);
-//		else if(pizzeriaRMI.todoEntry())
-//			iw.setStatus(1);
+//		else 
+			if(pizzeriaRMI.todoEntry())
+			iw.setStatus(1);
 	}
 
 	private IPizzeriaRMI getEntry(Integer port, String bindingName){

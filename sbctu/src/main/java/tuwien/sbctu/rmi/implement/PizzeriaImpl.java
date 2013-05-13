@@ -51,7 +51,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		for(int i = 1; i <= tableSize; i++){
 			Long tabId = Long.valueOf(i);
 			freeTables.add(new Table(tabId));
-			System.out.println("* Created table, id: "+i);
+//			System.out.println("* Created table, id: "+i);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		System.out.println("GuestGroup entered: "+group.getId());
 		subscriber.notification("* RMIPizzeria: Welcome!");
 		
-		logrec.guestInfo("!entry "+group.getId()+" "+group.getGroupSize());
+		logrec.guestInfo("New group id:"+group.getId()+" entered, they need "+group.getGroupSize()+" chairs.");
 	}
 	public void waiterWorkNotifier(String message){
 		for(IWaiterRMI iwr: iw){
@@ -106,7 +106,8 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		}
 		System.out.println("Group: "+tab.getGroupID()+" is sitting on table: "+ tab.getId());
 		int freeChair = 4 - group.getGroupSize();
-		logrec.tableInfo("!table id:"+tab.getId()+" leftFree:"+freeChair+" groupID:"+tab.getGroupID());
+		logrec.tableInfo("Table id:"+tab.getId()+" is used.");
+		logrec.guestInfo("Group id:"+tab.getGroupID()+" takes place. Chairs free:"+freeChair);
 	}
 
 	@Override
@@ -119,14 +120,14 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			pizzas += order.getPizzaList().get(i)+" ";
 		}
 		
-		logrec.orderInfo("!order id:"+order.getId()+" for groupID:"+order.getGroupID()+" with pizza:"+pizzas);
+		logrec.orderInfo("New order id:"+order.getId()+"\n\t for group id:"+order.getGroupID()+"\n\t\t with pizza:"+pizzas);
 	}
 
 	@Override
 	public void waiterEnteres(Waiter w, IWaiterRMI iw) throws RemoteException {
 		this.iw.add(iw);
 		System.out.println("Waiter: "+w.getId()+" entered.");
-		logrec.waiterInfo("!waiter id:"+w.getId()+" entered.");
+		logrec.guestInfo("Waiter id:"+iw.getId()+" entered.");
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 				break;
 			}
 		}
-		logrec.waiterInfo("!waiter id:"+iwr.getId()+" left.");
+		logrec.guestInfo("Waier id:"+iwr.getId()+" left.");
 	}
 
 	@Override
@@ -226,7 +227,8 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	public void cookEnters(Cook cook, ICookRMI cookrmi) throws RemoteException {
 		ic.add(cookrmi);	
 		System.out.println("Cook: "+cook.getId()+" entered the kitchen.");
-		logrec.cookInfo("!entered id:"+cook.getId()+" entered the kitchen.");
+//		if(logrec != null)
+		logrec.guestInfo("Cook id:"+cook.getId()+" entered the kitchen.");
 	}
 
 	@Override
@@ -287,13 +289,14 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			System.out.println("Order: "+order.getId()+" is being prepared for table:"+order.getTableID()+".");
 		}
 		cookWorkNotifier("Todo: Order recieved.");
-		logrec.orderInfo("processing orderId:"+order.getId()+" status:"+order.getStatus());
+		logrec.orderInfo("Order id:"+order.getId()+" is being:"+order.getStatus());
 	}
 	
 	
 	public Pizza cookPizza() throws RemoteException{
 		Pizza p = pizzas.poll();
-		logrec.pizzaInfo("!pizza is being cooked name:"+p.getName());
+		if(p!=null)
+			logrec.pizzaInfo("Pizza *"+p.getName()+"* is being cooked.");
 		return p;
 		
 	}
@@ -328,9 +331,9 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 					//iterate pizzas to find the finished one 
 					//also increment the counter to determine if order is finished
 					for(Pizza p : o.getPizzaList()){
-						if(p.getName().equals(pizza.getName())){
+						if(p.getName().equals(pizza.getName()) && !p.getStatus().equals(PizzaStatus.FINISHED)){
 							p.setStatus(PizzaStatus.FINISHED);
-							logrec.pizzaInfo("finished pId:"+p.getName()+" from orderId:"+o.getId());
+							logrec.pizzaInfo("Pizza *"+p.getName()+"* from order id:"+o.getId()+" finished");
 							found = true;
 						}
 						if(p.getStatus().equals(PizzaStatus.FINISHED))
@@ -338,8 +341,8 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 						if(counter == sizeOrder){
 							o.setOrderstatus(OrderStatus.COOKED);
 							finishedOrder.add(o);
-							waiterWorkNotifier("Order: "+o.getId()+" is ready for serving.");
-							logrec.orderInfo("!finished orderId:"+o.getId());
+							waiterWorkNotifier("Order id:"+o.getId()+" is ready for serving.");
+							logrec.orderInfo("Order id:"+o.getId()+" is ready for serving.");
 						}
 					}	
 				}
@@ -355,7 +358,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			usedTables.add(tab);
 		}
 		guestNotifier("Your meal is ready, Bon appetit!", tab.getGroupID());
-		logrec.guestInfo("Your meal is ready, Bon appetit!");
+		logrec.guestInfo("Order id:"+tab.getOrder().getId()+"\n\t recieved on table id:"+tab.getId()+"\n\t\t for group id:"+tab.getGroupID());
 	}
 	
 	@Override
@@ -364,7 +367,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			usedTables.add(tab);
 		}
 		guestNotifier("Bill to pay: "+tab.getBill(), tab.getGroupID());
-		logrec.guestInfo("!bill "+tab.getBill());
+		logrec.guestInfo("Group id:"+tab.getGroupID()+" - Your Bill sum:"+tab.getBill()+", table id:"+tab.getId());
 	}
 
 	@Override
@@ -392,7 +395,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			}
 		}
 		waiterWorkNotifier("Bill is requested.");
-		logrec.waiterInfo("!bill is requested");
+		logrec.waiterInfo("Group id:"+groupId+" wants to pay.");
 	}
 
 	@Override
@@ -412,15 +415,18 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			while(it.hasNext()){
 				Table t = (Table) it.next();
 				if (t.getGroupID().equals(groupId)){
+					logrec.tableInfo("Table id:"+t.getId()+" is free.");
 					t.leaveTable();
 					freeTable = t;
 					it.remove();
 				}
 			}
 			freeTables.add(freeTable);
+			
 			System.out.println("Group left, table:"+freeTable.getId()+" is free.");
 		}
-		logrec.guestInfo("!left groupId:"+groupId);
+		
+		logrec.guestInfo("Group id:"+groupId+" left happily the pizzeria.");
 	}
 
 	@Override
@@ -452,6 +458,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	@Override
 	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException {
 		this.logrec = logrmi;
-		
+		logrec.testMe();
+		System.out.println("GUI registered.");
 	}
 }

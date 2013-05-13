@@ -26,10 +26,11 @@ public class PizzeriaGUI extends javax.swing.JFrame {
 	private static final long serialVersionUID = 1L;
 	private static boolean isActive;
 	private IPizzeriaRMI pizzeriaRMI;
-	private int port;
-	private String bindingName;
+	private static int port;
+	private static String bindingName;
 	
 	private static ILoggingRMI ilog;
+	private int idCounter = 0;
 	
     /**
      * Creates new form PizzeriaGUI
@@ -37,6 +38,8 @@ public class PizzeriaGUI extends javax.swing.JFrame {
     public PizzeriaGUI() {
         initComponents();
         isActive = true;
+        port = 10879;
+        bindingName = "pizzeria";
     }
 
     /**
@@ -165,17 +168,30 @@ public class PizzeriaGUI extends javax.swing.JFrame {
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here:
+    	Integer size = Integer.valueOf(jTextField1.getText());
+    	Integer groups = Integer.valueOf(jTextField2.getText());
+    	
+    	for(int i = 0 ; i < groups; i++){
+    		idCounter++;
+    		Thread group = new Thread(new RunGuestGroup( new Long(idCounter+1000), port, bindingName, size));
+    		group.start();
+    	}
+    	jTextField1.setText("");
+    	jTextField2.setText("");
     }                                      
 
     /**
      * @param args the command line arguments
      */
+//  public static PizzeriaGUI returnGUI;
+  /*
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+  
+         Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+         
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -194,34 +210,44 @@ public class PizzeriaGUI extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        /* Create and display the form */
+       Create and display the form 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PizzeriaGUI().setVisible(true);
+//                returnGUI = new PizzeriaGUI();
+//                returnGUI.setVisible(true);
                 
-                while(isActive){
-                	updateFields();
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {                	
+							returnGUI.subscribeToRMI();
+							returnGUI.updateFields();
+                    }
+                  });
+
                 
             }
+            
+            
+            
         });
-    }
+    }*/
     
     public void subscribeToRMI(){
     	pizzeriaRMI = getEntry(port, bindingName);
     	
-    }
-    
-    public void subscribeToSBC(){
-    	
     	try {
+    		
     		ilog = new LoggingRMIImpl();
+    		
 			pizzeriaRMI.subscribeGUI(ilog);
-		} catch (RemoteException e) {
+		
+    	} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
+    }
+    
+    public void subscribeToSBC(){
+ 	
     }
     
     private IPizzeriaRMI getEntry(Integer port, String bindingName){
@@ -248,9 +274,53 @@ public class PizzeriaGUI extends javax.swing.JFrame {
 		return entry;
 	}
     
-    public static void updateFields(){
-    	System.out.println("updateeee");
-//    	String old = 
+    public void updateFields(){
+    	
+      while(isActive){
+//		if(pizzeriaRMI!=null){	
+    	try {
+			String bill = ilog.getBill();
+			String cook = ilog.getCook();
+			String guest = ilog.getGuest();
+			String order = ilog.getOrder();
+			String pizza = ilog.getPizza();
+			String table = ilog.getTable();
+			String waiter = ilog.getWaiter();
+			
+			if(guest!=null){
+			String olGuest = guestTXT.getText(); 
+			guestTXT.setText(olGuest+"\n"+guest);
+			}
+			if(bill!=null){
+			String olGuest = guestTXT.getText();
+			guestTXT.setText(olGuest+"\n"+bill);
+			}
+			if(order!=null){
+			String olOrder = guestTXT.getText();
+			ordersTXT.setText(olOrder+"\n"+order);
+			}
+			if(pizza!=null){
+			String olPizza = pizzasTXT.getText();
+			pizzasTXT.setText(olPizza+"\n"+pizza);
+			}
+			if(table!=null){
+			String olTable = tableTXT.getText();
+			tableTXT.setText(olTable+"\n"+table);
+			}
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//    	}
+
+    }
     }
     
     // Variables declaration - do not modify                     

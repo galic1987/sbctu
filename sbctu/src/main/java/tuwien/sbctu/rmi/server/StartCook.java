@@ -12,8 +12,6 @@ public class StartCook {
 		Long count = new Long (Long.valueOf(args[0]));
 		Integer port = Integer.valueOf(args[1]);
 		
-	
-			
 		Thread group = new Thread(new RunCook(count, port, args[2]));
 		group.start();
 	
