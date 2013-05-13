@@ -25,7 +25,7 @@ public interface IPizzeriaRMI extends Remote{
 	public void sitdownGuestGroup(GuestGroup group, Table tab) throws RemoteException;
 	
 	public void waiterEnteres(Waiter w, IWaiterRMI iw) throws RemoteException;
-	public void waiterLeaves() throws RemoteException;
+	public void waiterLeaves(IWaiterRMI iwr) throws RemoteException;
 	public void freeTable(Table table) throws RemoteException;
 	public void returnToEntry(GuestGroup group) throws RemoteException;
 	public void putTableBack(Table tab) throws RemoteException;
@@ -45,7 +45,6 @@ public interface IPizzeriaRMI extends Remote{
 	public void cookEnters(Cook cook, ICookRMI cookrmi) throws RemoteException;
 	public Pizza cookPizza() throws RemoteException;		
 	public void pizzaCooked(Pizza pizza) throws RemoteException;
-	public void putFinishedOrderToBar(Order order)throws RemoteException;
 	
 	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException;
 }
