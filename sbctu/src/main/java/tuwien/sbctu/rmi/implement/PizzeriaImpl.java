@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import tuwien.sbctu.models.Cook;
 import tuwien.sbctu.models.Cook.CookStatus;
 import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.LoggingRecorder;
 import tuwien.sbctu.models.Order;
 import tuwien.sbctu.models.Order.OrderStatus;
 import tuwien.sbctu.models.Pizza;
@@ -25,10 +26,12 @@ import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
 
 public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
+	
+	LoggingRecorder logrec = new LoggingRecorder();
 
 	Queue<GuestGroup> waitingEntry = new ConcurrentLinkedQueue<GuestGroup>();
-
 	List<GuestGroup> guests = new ArrayList<GuestGroup>();
+	
 	List<Table> freeTables = Collections.synchronizedList(new ArrayList<Table>());
 	List<Table> usedTables = Collections.synchronizedList(new ArrayList<Table>());	
 	
@@ -60,6 +63,8 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		waiterWorkNotifier("Entry : Guests are waiting.");
 		System.out.println("GuestGroup entered: "+group.getId());
 		subscriber.notification("* RMIPizzeria: Welcome!");
+		
+		logrec.insertGuestInfo("!entry "+group.getId()+" "+group.getGroupSize());
 	}
 	public void waiterWorkNotifier(String message){
 		for(IWaiterRMI iwr: iw){
@@ -75,7 +80,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	}
 
 	@Override
-	public synchronized GuestGroup getFromEntry() throws RemoteException {
+	public GuestGroup getFromEntry() throws RemoteException {
 		GuestGroup gg = waitingEntry.poll();
 		return gg;
 	}
@@ -124,7 +129,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	}
 
 	@Override
-	public Table getTableWithStatus(TableStatus tb) throws RemoteException {
+	public synchronized Table getTableWithStatus(TableStatus tb) throws RemoteException {
 		Table result = null;
 		
 		synchronized (freeTables){
@@ -145,7 +150,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		return result;
 	}
 	
-	public Table getUsedTableWithStatus(TableStatus tb) throws RemoteException {
+	public synchronized Table getUsedTableWithStatus(TableStatus tb) throws RemoteException {
 		Table result = null;
 		
 		synchronized (usedTables){
@@ -168,7 +173,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	
 	public Table getTableWithId(Long tb) throws RemoteException {
 		Table result = null;
-		System.out.println("Looking for table:"+tb+" ...");
+		
 		synchronized (usedTables){
 		
 		Iterator<Table> it = usedTables.iterator();
@@ -400,12 +405,39 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 			}
 			freeTables.add(freeTable);
 			System.out.println("Group left, table:"+freeTable.getId()+" is free.");
-//			for(Table t: usedTables){
-//				if(t.getGroupID().equals(groupId)){
-//					t.setTabStat(TableStatus.FREE);
-//				}
-//			}
 		}
+		
+	}
+
+	@Override
+	public boolean todoEntry() throws RemoteException {		
+		return !waitingEntry.isEmpty();
+	}
+
+	@Override
+	public boolean todoBill() throws RemoteException {
+		boolean result = false;
+		
+		Iterator<Table> it = usedTables.iterator();
+		
+		while(it.hasNext()){
+			Table t = it.next();
+			if(t.getTabStat().equals(TableStatus.PAY)){
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public boolean todoBar() throws RemoteException {
+		return !finishedOrder.isEmpty();
+	}
+
+	@Override
+	public void subscribeGUI() throws RemoteException {
+		// TODO Auto-generated method stub
 		
 	}
 }

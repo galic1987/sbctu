@@ -60,10 +60,7 @@ public class RunWaiter implements Runnable{
 			
 			try {
 				work();
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				Thread.sleep(500);
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -78,7 +75,8 @@ public class RunWaiter implements Runnable{
 		switch(ws){
 
 		case 0:
-//			lookForWork();
+			
+			lookForWork();
 			break;
 		case 1:
 			bringToTable();
@@ -183,7 +181,13 @@ public class RunWaiter implements Runnable{
 	}
 	
 	private void processBill() throws RemoteException{
-		Table tab = pizzeriaRMI.getUsedTableWithStatus(TableStatus.PAY);
+		Table tab = null;
+		
+		try{
+			tab = pizzeriaRMI.getUsedTableWithStatus(TableStatus.PAY);
+		
+		
+		if(tab!= null){
 		double bill = 0.0;
 		System.out.println("processBill for table:"+tab.getId());
 		Order o = tab.getOrder();
@@ -195,10 +199,25 @@ public class RunWaiter implements Runnable{
 		
 		tab.setBill(bill);
 		pizzeriaRMI.putTableBill(tab);
-		
+		}
+		} catch (NullPointerException npe){
+			System.out.println("All payed.");
+		}
+			
 		System.out.println("..waiting to do more work ...");
 		iw.setStatus(0);
 	}
+	
+	private void lookForWork() throws RemoteException{
+		
+//		if(pizzeriaRMI.todoBill())
+//			iw.setStatus(4);
+//		else if(pizzeriaRMI.todoBar())
+//			iw.setStatus(3);
+//		else if(pizzeriaRMI.todoEntry())
+//			iw.setStatus(1);
+	}
+
 	private IPizzeriaRMI getEntry(Integer port, String bindingName){
 		Registry registry = null;
 
