@@ -33,6 +33,10 @@ public class Order implements Serializable{
 		super();
 		this.id = id;
 	}
+	
+	public Order() {
+		super();
+	}
 
 	public enum OrderStatus {
 		ORDERED, PROCESSING, COOKED, SERVING, PAID;
