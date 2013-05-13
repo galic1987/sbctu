@@ -38,9 +38,14 @@ public interface IPizzeriaRMI extends Remote{
 	public void putNewOrderToBar(Order order) throws RemoteException;
 	public Order isOrderWaiting() throws RemoteException;
 	public void putTableBill(Table tab) throws RemoteException;
+	public boolean todoEntry() throws RemoteException;
+	public boolean todoBill() throws RemoteException;
+	public boolean todoBar() throws RemoteException;
 	
 	public void cookEnters(Cook cook, ICookRMI cookrmi) throws RemoteException;
 	public Pizza cookPizza() throws RemoteException;		
 	public void pizzaCooked(Pizza pizza) throws RemoteException;
 	public void putFinishedOrderToBar(Order order)throws RemoteException;
+	
+	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException;
 }

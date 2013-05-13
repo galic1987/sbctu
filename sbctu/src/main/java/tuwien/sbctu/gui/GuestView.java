@@ -1,11 +1,19 @@
 package tuwien.sbctu.gui;
 
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import tuwien.sbctu.gui.tablemodels.GroupsTableModel;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.LoggingRecorder;
+import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 
 /**
  *
@@ -13,7 +21,16 @@ import tuwien.sbctu.models.GuestGroup;
  */
 public class GuestView extends javax.swing.JFrame {
 
-    /**
+	private final int RMI = 0;
+	private final int SBC = 1;
+    
+	private IPizzeriaRMI pizzeriaRMI;
+	private int port;
+	private String bindingName;
+	
+	private LoggingRecorder logrec;
+	
+	/**
      * Creates new form GuestView
      */
     public GuestView() {
@@ -175,6 +192,40 @@ public class GuestView extends javax.swing.JFrame {
             }
         });
     }
+    
+    public void subscribeToRMI(){
+    	pizzeriaRMI = getEntry(port, bindingName);
+    	
+    }
+    
+    public void subscribeToSBC(){
+    	
+    	
+    }
+    
+    private IPizzeriaRMI getEntry(Integer port, String bindingName){
+		Registry registry = null;
+
+		try {
+			registry = LocateRegistry.getRegistry(port);
+		} catch (RemoteException e1) {
+			e1.printStackTrace();
+		}
+
+		IPizzeriaRMI entry = null;
+
+		try {
+			entry = (IPizzeriaRMI) registry.lookup(bindingName);
+		} catch (NotBoundException e) {
+			e.printStackTrace();
+		} catch (AccessException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+		return entry;
+	}
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
