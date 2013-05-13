@@ -86,8 +86,8 @@ public class RunGuestSBC implements NotificationListener {
 	        
             TransactionReference tx = capi.createTransaction(timeOut, space);
 
-			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
-		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx);
+			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 1000, tx);
+		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 1000, tx);
 
 		    
 		    g.setStatus(GroupStatus.ENTERED);
@@ -95,8 +95,8 @@ public class RunGuestSBC implements NotificationListener {
 			
 
 			
-		    Entry entry = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId())), QueryCoordinator.newCoordinationData()));
-		    Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
+		    Entry entry = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()))));
+		  //Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
 
 			
 			new RunGuestSBC();
@@ -104,7 +104,7 @@ public class RunGuestSBC implements NotificationListener {
 			//test shizzle
 			//capi.write(entrance, entry); 
 			capi.write(entrance, entry);
-			capi.write(entrance, entry2);
+			//capi.write(entrance, entry2);
 
 
 			

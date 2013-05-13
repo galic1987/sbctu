@@ -76,7 +76,6 @@ public class Pizzeria implements NotificationListener {
 
         
         ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
-        tableCoords.add(new FifoCoordinator());
         tableCoords.add(new KeyCoordinator());
         tableCoords.add(new QueryCoordinator());
 
@@ -102,8 +101,10 @@ public class Pizzeria implements NotificationListener {
         Set<Operation> operations = new HashSet<Operation>();
         //operations.add(Operation.ALL);
         //operations.add(Operation.DELETE);
-        manager.createNotification(tables, this, Operation.ALL, null, null);
-		
+        manager.createNotification(tables, this, Operation.WRITE, null, null);
+        manager.createNotification(tables, this, Operation.DELETE, null, null);
+        manager.createNotification(bar, this, Operation.WRITE, null, null);
+
 		
 	}
 	
@@ -115,7 +116,7 @@ public class Pizzeria implements NotificationListener {
 		for (Serializable entry : arg2) {
 			
 			
-		
+			
 			//GuestGroup g = (GuestGroup) entry;
 				
 	            System.out.println("--> Notification: ID " +entry.getClass() + " " + arg1.toString());

@@ -55,7 +55,7 @@ public class RunWaiterSBC {
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);
          w = new Waiter(id);
-         timeOut = 1000;
+         timeOut = 10000;
          
          working = new AtomicBoolean();
          working.set(false);
@@ -71,9 +71,9 @@ public class RunWaiterSBC {
 	        
             TransactionReference tx = capi.createTransaction(timeOut, space);
 
-			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
-		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx);
-		    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, 0, tx);
+			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, timeOut, tx);
+		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, timeOut, tx);
+		    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, timeOut, tx);
 
 		    
 		    
@@ -139,12 +139,18 @@ public class RunWaiterSBC {
         	tx = capi.createTransaction(timeOut, space);
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
-	        // query coordinator
+	        // query coordinator   
+	        // 
         	Query q = new Query().sql("group.currentStatus = 'ORDERED' LIMIT 1");
+        	
+        	System.out.println("*****" +capi.test(tables));
 
-            entries = capi.take(entrance, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.INFINITE, tx);
             Table t = entries.get(0);
             Order o = t.getOrder();
+            
+            System.out.println("----->  " +o.toString());
+            
             o.setOrderstatus(OrderStatus.ORDERED);
             t.getGroup().setStatus(GroupStatus.ORDERONBAR);
             
