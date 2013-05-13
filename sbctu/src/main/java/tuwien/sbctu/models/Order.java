@@ -3,6 +3,9 @@ package tuwien.sbctu.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.mozartspaces.capi3.Queryable;
+
+@Queryable(autoindex=true)
 public class Order implements Serializable{
 
 	/**
@@ -23,8 +26,14 @@ public class Order implements Serializable{
 	private Long waiterBillProcessedId;
 	
 	
+	private String status;
 	
 	
+	public Order(Long id) {
+		super();
+		this.id = id;
+	}
+
 	public enum OrderStatus {
 		ORDERED, PROCESSING, COOKED, SERVING, PAID;
 		
@@ -73,6 +82,9 @@ public class Order implements Serializable{
 		pizzaList.add(pizza);
 		return true;
 	}
+	
+	
+	
 
 	public ArrayList<Pizza> getPizzaList() {
 		return pizzaList;
@@ -83,6 +95,7 @@ public class Order implements Serializable{
 	}
 
 	public void setOrderstatus(OrderStatus orderstatus) {
+		this.status = orderstatus.toString();
 		this.orderstatus = orderstatus;
 	}
 
@@ -108,6 +121,14 @@ public class Order implements Serializable{
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

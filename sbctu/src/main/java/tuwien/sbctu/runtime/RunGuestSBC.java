@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
@@ -21,6 +22,7 @@ import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
+import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
@@ -28,6 +30,9 @@ import org.mozartspaces.notifications.Operation;
 
 import tuwien.sbctu.conf.PizzeriaConfiguration;
 import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Pizza;
+import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
 
 public class RunGuestSBC implements NotificationListener {
@@ -44,6 +49,13 @@ public class RunGuestSBC implements NotificationListener {
 	protected static URI space;
 	protected static ContainerReference entrance;
 	protected static ContainerReference tables;
+	protected static GuestGroup g;
+	
+	
+	protected static AtomicBoolean working;
+	protected static int timeOut;
+	
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -53,9 +65,16 @@ public class RunGuestSBC implements NotificationListener {
 
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);
-         GuestGroup g = new GuestGroup(id);
+         
+         timeOut = 1000;
+         
+         working = new AtomicBoolean();
+         working.set(false);
+         
+         g = new GuestGroup(id);
          g.setStatus(GroupStatus.WELCOME);
-		
+		    System.out.println(g.getStatus());
+
         try {
 			space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI);
 
@@ -65,8 +84,8 @@ public class RunGuestSBC implements NotificationListener {
 	        obligatoryCoords.add(new KeyCoordinator());
 	        
 	        
-            TransactionReference tx = capi.createTransaction(10000, space);
-            TransactionReference tx2 = capi.createTransaction(10000, space);
+            TransactionReference tx = capi.createTransaction(timeOut, space);
+            TransactionReference tx2 = capi.createTransaction(timeOut, space);
 
 			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
 		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx2);
@@ -125,32 +144,13 @@ public class RunGuestSBC implements NotificationListener {
 
 				// its me mario
 				if(g.getStatus().equals(GroupStatus.SITTING)){
-	        		 g.placeOrder();
-	        		 g.setStatus(GroupStatus.ORDERED);
-	        		 
-	        		 
-	     			 try {
-						capi.write(tables, new Entry(g));
-					} catch (MzsCoreException e) {
-						// TODO Auto-generated catch block
-						
-						e.printStackTrace();
-					}
-
+	     			 makeOrder();
 	        	 }
 	        	 
 	        	 
 	        	 if(g.getStatus().equals(GroupStatus.EATING)){
 	        		 g.eatPizzaNotDishes();
-	        		 g.setStatus(GroupStatus.BILL);
-	        		 
-	        		 try {
-							capi.write(tables, new Entry(g));
-						} catch (MzsCoreException e) {
-							// TODO Auto-generated catch block
-							
-							e.printStackTrace();
-						}
+	        		demandBill();
 	        	 }
 	        	 
 	        	 
@@ -164,6 +164,76 @@ public class RunGuestSBC implements NotificationListener {
         }		
 		
 		
+	}
+	
+	
+	public static void makeOrder(){
+		TransactionReference tx;
+        try {
+        	working.set(true);
+        	tx = capi.createTransaction(timeOut, space);
+	        ArrayList<Table> entries = new ArrayList<Table>();
+	        
+	        // take it from tables
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+            Table t = entries.get(0);
+            
+            
+            // make order
+            t.getGroup().setStatus(GroupStatus.ORDERED);
+            Order o = new Order(id);
+            o.addPizzaToOrder(new Pizza("Margarite", 10.0f, 5));
+            o.addPizzaToOrder(new Pizza("Fungi", 1.0f, 3));
+            o.addPizzaToOrder(new Pizza("Rusticana", 12.0f, 2));
+            t.setOrder(o);
+            
+		    Entry entry = new Entry(t, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(t.getId())), QueryCoordinator.newCoordinationData()));
+			
+		    // write it again
+			capi.write(entry, tables,timeOut,tx);
+
+		  //  capi.write(tables, entry);
+			
+		} catch ( Exception e) {
+			// AutoRollback
+			
+			e.printStackTrace();
+		}finally{
+        	working.set(false);
+		}
+	}
+
+	
+	public static void demandBill(){
+		TransactionReference tx;
+        try {
+        	working.set(true);
+        	tx = capi.createTransaction(timeOut, space);
+	        ArrayList<Table> entries = new ArrayList<Table>();
+	        
+	        // take it from tables
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+            Table t = entries.get(0);
+            
+            
+            // make order
+            t.getGroup().setStatus(GroupStatus.BILL);
+           
+            
+		    Entry entry = new Entry(t, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(t.getId())), QueryCoordinator.newCoordinationData()));
+			
+		    // write it again
+			capi.write(entry, tables,timeOut,tx);
+
+		  //  capi.write(tables, entry);
+			
+		} catch ( Exception e) {
+			// AutoRollback
+			
+			e.printStackTrace();
+		}finally{
+        	working.set(false);
+		}
 	}
 
 }

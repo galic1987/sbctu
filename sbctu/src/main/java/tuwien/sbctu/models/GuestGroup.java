@@ -19,6 +19,7 @@ public class GuestGroup extends Person{
 	
 	private int groupSize;
 	private GroupStatus gStatus;
+	private String currentStatus;
 
 	public Long getId() {
 		// TODO Auto-generated method stub
@@ -64,7 +65,10 @@ public class GuestGroup extends Person{
 	
 	public void setStatus(GroupStatus status){
 		this.gStatus = status;
+		//System.out.println(status.toString());
+		this.currentStatus = status.toString();
 	}
+	
 	public GroupStatus getStatus(){
 		return gStatus;
 	}
@@ -77,8 +81,16 @@ public class GuestGroup extends Person{
 		this.groupSize = groupSize;
 	}
 
+	public String getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public void setCurrentStatus(String currentStatus) {
+		this.currentStatus = currentStatus;
+	}
+
 	public enum GroupStatus {
 
-		WELCOME, ENTERED, SITTING, ORDERED, EATING, FINISHED, BILL
+		WELCOME, ENTERED, SITTING, ORDERED, ORDERONBAR, EATING, FINISHED, BILL
 	}
 }

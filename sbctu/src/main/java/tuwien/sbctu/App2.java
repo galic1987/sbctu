@@ -97,7 +97,8 @@ public class App2 {
 			// Take one entry
             try {
             	
-            	Query q = new Query().sql("groupSize >= 3");
+            	Query q = new Query().sql("currentStatus = 'ENTERED' AND groupSize > 2 LIMIT 1 ");
+            	//Query q = new Query().sql("groupSize >= 3");
             	
             	ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
             	tableCoords.add(new FifoCoordinator());
@@ -114,6 +115,7 @@ public class App2 {
 
             // output
             System.out.println(message.getId());
+            System.out.println(message.getStatus());
           
 
             capi.commitTransaction(tx);

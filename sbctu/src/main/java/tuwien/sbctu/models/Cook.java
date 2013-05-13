@@ -1,5 +1,7 @@
 package tuwien.sbctu.models;
 
+import tuwien.sbctu.models.Order.OrderStatus;
+
 public class Cook extends Person{
 
 	/**
@@ -19,9 +21,15 @@ public class Cook extends Person{
 		return null;
 	}
 	
-	public boolean cookPizzasFromOrder(Order order){
+	public boolean cookPizzasFromOrder(Order o) throws InterruptedException{
 		//TODO
-		return false;
+		
+		for (Pizza p : o.getPizzaList()) {
+			Thread.sleep(p.getPrepareTime());
+		}
+      
+      	o.setOrderstatus(OrderStatus.COOKED);
+		return true;
 	}
 	
 	public boolean putOrderOnTheke(Order order){
