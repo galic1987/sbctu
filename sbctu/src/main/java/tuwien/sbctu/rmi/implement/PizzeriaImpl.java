@@ -22,6 +22,7 @@ import tuwien.sbctu.models.Table.TableStatus;
 import tuwien.sbctu.models.Waiter;
 import tuwien.sbctu.rmi.interfaces.ICookRMI;
 import tuwien.sbctu.rmi.interfaces.IGuestGroupRMI;
+import tuwien.sbctu.rmi.interfaces.ILoggingRMI;
 import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
 
@@ -436,7 +437,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 	}
 
 	@Override
-	public void subscribeGUI() throws RemoteException {
+	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	}

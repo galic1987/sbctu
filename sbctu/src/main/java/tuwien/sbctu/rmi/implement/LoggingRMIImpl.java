@@ -8,55 +8,60 @@ import tuwien.sbctu.rmi.interfaces.ILoggingRMI;
 
 public class LoggingRMIImpl extends UnicastRemoteObject implements ILoggingRMI{
 	
-	LoggingRecorder logrec = new LoggingRecorder();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	LoggingRecorder logrec;
 
-	protected LoggingRMIImpl() throws RemoteException {
+	public LoggingRMIImpl() throws RemoteException {
 		super();
+		logrec = new LoggingRecorder();
 	}
 
 	@Override
 	public void guestInfo(String message) throws RemoteException {
-		logrec.insertGuestInfo(message);
+		logrec.insertGuestInfo(processMessage(message));
 		
 	}
 
 	@Override
 	public void waiterInfo(String message) throws RemoteException {
-		logrec.insertWaiterInfo(message);		
+		logrec.insertWaiterInfo(processMessage(message));		
 	}
 
 	@Override
 	public void cookInfo(String message) throws RemoteException {
-		logrec.insertCookInfo(message);
+		logrec.insertCookInfo(processMessage(message));
 		
 	}
 
 	@Override
 	public void tableInfo(String message) throws RemoteException {
-		logrec.insertTableInfo(message);
+		logrec.insertTableInfo(processMessage(message));
 		
 	}
 
 	@Override
 	public void pizzaInfo(String message) throws RemoteException {
-		// TODO Auto-generated method stub
+		logrec.insertPizzaInfo(processMessage(message));
 		
 	}
 
 	@Override
 	public void orderInfo(String message) throws RemoteException {
-		// TODO Auto-generated method stub
+		logrec.insertOrderInfo(processMessage(message));
 		
 	}
 
 	@Override
 	public void billInfo(String message) throws RemoteException {
-		// TODO Auto-generated method stub
+		logrec.insertBillInfo(processMessage(message));
 		
 	}
 	
-	public void processMessage(String message){
-		
+	public String processMessage(String message){
+		return message;
 	}
 
 }

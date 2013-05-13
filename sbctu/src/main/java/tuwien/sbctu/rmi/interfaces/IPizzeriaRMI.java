@@ -47,5 +47,5 @@ public interface IPizzeriaRMI extends Remote{
 	public void pizzaCooked(Pizza pizza) throws RemoteException;
 	public void putFinishedOrderToBar(Order order)throws RemoteException;
 	
-	public void subscribeGUI() throws RemoteException;
+	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException;
 }
