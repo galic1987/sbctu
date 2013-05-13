@@ -67,11 +67,13 @@ mvn exec:java -Dexec.mainClass="tien.sbctu.runtime.RunWaiterSBC" -Dexec.args="13
 
 
 ====== RMI =======
-Parameters needed to start ..
+RMI server on localhost port 10879 will be started automatically on RMI-bindingName "pizzeria"
 
-StartWaiter: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> -  i.e. 1 10879 pizzeria
-StartCook: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> -  i.e. 1 10879 pizzeria
-StartGuestGroup: <id> <hardcodedPort 10879> <hardcodedBindingName pizzeria> <groupSize> - i.e. 1 10879 pizzeria 1
+1. start "StartRMI.java" arguments: -numberOfTables
+2. start "StartGUI.java" (no arguments)
+3. start "StartWaiter.java" arguments: -waiterID -rmiPort -bindingName (i.e. 1 10879 pizzeria)
+4. start "StartCook.java" arguments: -cookID -rmiPort -bindingName (i.e. 2 10879 pizzeria)
+5. guests can be started from the gui
 
 
 
