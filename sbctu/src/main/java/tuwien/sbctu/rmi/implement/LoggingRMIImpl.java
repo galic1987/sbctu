@@ -12,6 +12,7 @@ public class LoggingRMIImpl extends UnicastRemoteObject implements ILoggingRMI{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	LoggingRecorder logrec;
 
 	public LoggingRMIImpl() throws RemoteException {
@@ -61,7 +62,56 @@ public class LoggingRMIImpl extends UnicastRemoteObject implements ILoggingRMI{
 	}
 	
 	public String processMessage(String message){
+		System.out.println(message);
 		return message;
+	}
+
+	@Override
+	public String getGuest() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getGuestInfo();
+	}
+
+	@Override
+	public String getWaiter() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getWaiterInfo();
+	}
+
+	@Override
+	public String getCook() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getCookInfo();
+	}
+
+	@Override
+	public String getTable() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getTableInfo();
+	}
+
+	@Override
+	public String getPizza() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getPizzaInfo();
+	}
+
+	@Override
+	public String getOrder() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getOrderInfo();
+	}
+
+	@Override
+	public String getBill() throws RemoteException {
+		// TODO Auto-generated method stub
+		return logrec.getBillInfo();
+	}
+
+	@Override
+	public void testMe() throws RemoteException {
+		// TODO Auto-generated method stub
+		System.out.println("SERVER: HIIIIII");
 	}
 
 }

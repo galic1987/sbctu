@@ -20,33 +20,33 @@ public class LoggingRecorder implements Serializable{
 	Queue<String> tableInfo = new ConcurrentLinkedQueue<String>();
 	
 	public LoggingRecorder (){
-		insertGuestInfo("GUEST1, 9");
-		insertGuestInfo("GUEST2");
-		insertGuestInfo("GUEST3");
-		
-		insertWaiterInfo("WAITER1");
-		insertWaiterInfo("WAITER2");
-		insertWaiterInfo("WAITER3");
-		
-		insertCookInfo("COOK1");
-		insertCookInfo("COOK2");
-		insertCookInfo("COOK3");
-		
-		insertOrderInfo("ORDER1");
-		insertOrderInfo("ORDER2");
-		insertOrderInfo("ORDER3");
-		
-		insertPizzaInfo("PIZZA1");
-		insertPizzaInfo("PIZZA2");
-		insertPizzaInfo("PIZZA3");
-		
-		insertBillInfo("BILL1");
-		insertBillInfo("BILL2");
-		insertBillInfo("BILL3");
-		
-		insertTableInfo("Table1");
-		insertTableInfo("Table2");
-		insertTableInfo("Table3");
+//		insertGuestInfo("GUEST1, 9");
+//		insertGuestInfo("GUEST2");
+//		insertGuestInfo("GUEST3");
+//		
+//		insertWaiterInfo("WAITER1");
+//		insertWaiterInfo("WAITER2");
+//		insertWaiterInfo("WAITER3");
+//		
+//		insertCookInfo("COOK1");
+//		insertCookInfo("COOK2");
+//		insertCookInfo("COOK3");
+//		
+//		insertOrderInfo("ORDER1");
+//		insertOrderInfo("ORDER2");
+//		insertOrderInfo("ORDER3");
+//		
+//		insertPizzaInfo("PIZZA1");
+//		insertPizzaInfo("PIZZA2");
+//		insertPizzaInfo("PIZZA3");
+//		
+//		insertBillInfo("BILL1");
+//		insertBillInfo("BILL2");
+//		insertBillInfo("BILL3");
+//		
+//		insertTableInfo("Table1");
+//		insertTableInfo("Table2");
+//		insertTableInfo("Table3");
 
 	}
 	
