@@ -1,8 +1,12 @@
 package tuwien.sbctu;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
@@ -22,18 +26,11 @@ import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 import tuwien.sbctu.conf.*;
 
-import tuwien.sbctu.container.*;
 import tuwien.sbctu.models.*;
+import tuwien.sbctu.models.GuestGroup.GroupStatus;
 
-public class Pizzeria {
-// TODO
-	/*
-	 * @ inputs list of guests - FIFO queue
-	 * @ inputs list of waiters
-	 * @ inputs list of cooks
-	 * @ inputs list of tables
-	 * 
-	 */
+public class Pizzeria implements NotificationListener {
+
 	
 	
 	
@@ -42,7 +39,7 @@ public class Pizzeria {
 	private final MzsCore core;
 	private final Capi capi;
 	private final URI space;
-	private final NotificationManager manager;
+	private NotificationManager manager;
 	
 	
 	private ContainerReference entrance;
@@ -76,7 +73,6 @@ public class Pizzeria {
 		ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
         obligatoryCoords.add(new FifoCoordinator());
         obligatoryCoords.add(new KeyCoordinator());
-        obligatoryCoords.add(new QueryCoordinator());
 
         
         ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
@@ -98,14 +94,41 @@ public class Pizzeria {
 	    bar = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
 	    		null,null);
 
+	    
+	    // TODO: hook the modafacka
+	    
+	 // Create notification
+        manager = new NotificationManager(core);
+        Set<Operation> operations = new HashSet<Operation>();
+        //operations.add(Operation.ALL);
+        //operations.add(Operation.DELETE);
+        manager.createNotification(tables, this, Operation.ALL, null, null);
 		
 		
-		
-//		entranceContainer = new FifoContainerXvsm<>(capi, space,
-//				PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE);
-//		tableContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_TABLES);
-//		barContainer = new IdContainerXvsm(capi, space, PizzeriaConfiguration.CONTAINER_NAME_BAR);
 	}
+	
+	
+	
+	@Override
+	public void entryOperationFinished(Notification arg0, Operation arg1,
+			List<? extends Serializable> arg2) {
+		for (Serializable entry : arg2) {
+			
+			
+		
+			//GuestGroup g = (GuestGroup) entry;
+				
+	            System.out.println("--> Notification: ID " +entry.getClass() + " " + arg1.toString());
+
+				
+			// TODO: here can we get all notficications and append them to the gui interface
+			
+            
+        }		
+		
+	}
+		
+		
 	
 	
 	

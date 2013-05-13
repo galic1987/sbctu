@@ -85,10 +85,9 @@ public class RunGuestSBC implements NotificationListener {
 	        
 	        
             TransactionReference tx = capi.createTransaction(timeOut, space);
-            TransactionReference tx2 = capi.createTransaction(timeOut, space);
 
 			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
-		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx2);
+		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx);
 
 		    
 		    g.setStatus(GroupStatus.ENTERED);

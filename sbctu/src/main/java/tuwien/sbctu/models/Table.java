@@ -2,6 +2,10 @@ package tuwien.sbctu.models;
 
 import java.io.Serializable;
 
+import org.mozartspaces.capi3.Queryable;
+
+
+@Queryable(autoindex=true)
 public class Table implements Serializable{
 
 	/**
