@@ -101,8 +101,8 @@ public class Pizzeria implements NotificationListener {
         Set<Operation> operations = new HashSet<Operation>();
         //operations.add(Operation.ALL);
         //operations.add(Operation.DELETE);
-        manager.createNotification(tables, this, Operation.WRITE, null, null);
-        manager.createNotification(tables, this, Operation.DELETE, null, null);
+       // manager.createNotification(tables, this, Operation.WRITE, null, null);
+       // manager.createNotification(tables, this, Operation.DELETE, null, null);
         manager.createNotification(bar, this, Operation.WRITE, null, null);
 
 		
@@ -117,9 +117,9 @@ public class Pizzeria implements NotificationListener {
 			
 			
 			
-			//GuestGroup g = (GuestGroup) entry;
+			Order o = (Order) ((Entry) entry).getValue();
 				
-	            System.out.println("--> Notification: ID " +entry.getClass() + " " + arg1.toString());
+	            System.out.println("--> Notification: ID " + o.getStatus() + " " + arg1.toString());
 
 				
 			// TODO: here can we get all notficications and append them to the gui interface

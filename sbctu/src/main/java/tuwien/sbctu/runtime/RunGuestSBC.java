@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -135,11 +136,33 @@ public class RunGuestSBC implements NotificationListener {
 	@Override
 	public void entryOperationFinished(Notification arg0, Operation arg1,
 			List<? extends Serializable> arg2) {
-		for (Serializable entry : arg2) {
-			GuestGroup g = (GuestGroup) entry;
-			if(g.getId() == id && (arg1.equals(Operation.WRITE) || arg1.equals(Operation.DELETE))){
+		
+        //System.out.println("> Notification: ID" +arg2.toString() + " " + arg1.toString());
+
+        if(arg1.equals(Operation.DELETE)){
+        	Table t = (Table)arg2.get(0);
+
+    		//System.out.println("fgasf" + t.getGroup().getId());
+
+        	if(t.getGroup().getId() == id){
+        		
+        		System.out.println("EXIT");
+        		g.leaveTheTableAndThePizzeriaAndGoWOderPFeffer();
+        		core.shutdown(true);
+        		System.exit(1);
+        	}
+        }		
+        
+        Iterator<? extends Serializable> iterator =  arg2.iterator();
+    	while (iterator.hasNext()) {
+        //for (Serializable entry : arg2) {
+			Table t = (Table) ((Entry) iterator.next()).getValue();
+			GuestGroup g = t.getGroup();
+            //System.out.println("--> Notification: ID" +g.getId() + " " + arg1.toString());
+			
+			if(g.getId() == id && arg1.equals(Operation.WRITE)){
 				
-	            System.out.println("--> Notification: ID" +g.getId() + " " + arg1.toString());
+	            System.out.println("Status "+ g.getStatus().toString()+  " ID " +g.getId() );
 
 				// its me mario
 				if(g.getStatus().equals(GroupStatus.SITTING)){
@@ -153,10 +176,7 @@ public class RunGuestSBC implements NotificationListener {
 	        	 }
 	        	 
 	        	 
-	        	 if(arg1.equals(Operation.DELETE)){
-	        		 g.leaveTheTableAndThePizzeriaAndGoWOderPFeffer();
-	        		 core.shutdown(true);
-	        	 }
+	        	 
 			}
 			
             
@@ -174,7 +194,7 @@ public class RunGuestSBC implements NotificationListener {
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
 	        // take it from tables
-            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.INFINITE, tx);
             Table t = entries.get(0);
             
             
@@ -190,6 +210,7 @@ public class RunGuestSBC implements NotificationListener {
 			
 		    // write it again
 			capi.write(entry, tables,timeOut,tx);
+			capi.commitTransaction(tx);
 
 		  //  capi.write(tables, entry);
 			
@@ -211,7 +232,7 @@ public class RunGuestSBC implements NotificationListener {
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
 	        // take it from tables
-            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.INFINITE, tx);
             Table t = entries.get(0);
             
             
@@ -223,6 +244,7 @@ public class RunGuestSBC implements NotificationListener {
 			
 		    // write it again
 			capi.write(entry, tables,timeOut,tx);
+			capi.commitTransaction(tx);
 
 		  //  capi.write(tables, entry);
 			

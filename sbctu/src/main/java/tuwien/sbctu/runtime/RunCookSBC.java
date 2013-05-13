@@ -54,7 +54,7 @@ public class RunCookSBC {
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);
          c = new Cook(id);
-         timeOut = 1000;
+         timeOut = 14000;
          
          working = new AtomicBoolean();
          working.set(false);
@@ -113,28 +113,29 @@ public class RunCookSBC {
 	        ArrayList<Order> orders = new ArrayList<Order>();
 	        
 	        // query coordinator
-        	Query qo = new Query().sql("status = 'FINISHED' LIMIT 1");
+        	Query qo = new Query().sql("status = 'ORDERED' LIMIT 1");
 
-        	orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.INFINITE, tx);
+        	orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
             Order o = orders.get(0);
-            
+            System.out.println(o.toString());
 //            for (Pizza p : o.getPizzaList()) {
             	c.cookPizzasFromOrder(o);
 				//Thread.sleep(p.getPrepareTime());
 //			}
-            	
+            	o.setOrderstatus(OrderStatus.COOKED);
             	
             	
             
             
 		    Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
-			capi.write(orderEntry, bar,timeOut,tx);
-			
+			capi.write(orderEntry, bar,RequestTimeout.TRY_ONCE,tx);
+			capi.commitTransaction(tx);
+
 			
 		} catch ( Exception e) {
 			// AutoRollback
 			
-			e.printStackTrace();
+			//e.printStackTrace();
 		}finally{
         	working.set(false);
 		}

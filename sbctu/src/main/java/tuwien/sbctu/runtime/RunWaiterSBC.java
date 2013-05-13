@@ -79,6 +79,9 @@ public class RunWaiterSBC {
 		    
 		    
 			for (;;) {
+				
+				System.out.println("-----> Starting all over again");
+
 				// 1. entrance check -> check entrance, and bring the guestgroups to table -> make table
 				entranceTake();
 				// 2. tables -> if order ORDERED -> put it on the theke -> status ORDERONBAR
@@ -89,7 +92,7 @@ public class RunWaiterSBC {
 				doTheBilling();
 				// sleep for a while, it is hard day
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -112,7 +115,8 @@ public class RunWaiterSBC {
         	working.set(true);
         	tx = capi.createTransaction(timeOut, space);
 	        ArrayList<GuestGroup> entries = new ArrayList<GuestGroup>();
-            entries = capi.take(entrance, Arrays.asList(FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+	        
+            entries = capi.take(entrance, Arrays.asList(FifoCoordinator.newSelector()) , RequestTimeout.TRY_ONCE, tx);
             GuestGroup g = entries.get(0);
             
             g.setStatus(GroupStatus.SITTING);
@@ -121,10 +125,13 @@ public class RunWaiterSBC {
 		    Entry entry = new Entry(t, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(t.getId())), QueryCoordinator.newCoordinationData()));
 			capi.write(entry, tables,timeOut,tx);
 			
+			System.out.println("Entry -> Tables with id " +  g.getId());
+			capi.commitTransaction(tx);
+			
 		} catch ( Exception e) {
 			// AutoRollback
 			
-			e.printStackTrace();
+			printExp(e);
 		}finally{
         	working.set(false);
 		}
@@ -143,13 +150,12 @@ public class RunWaiterSBC {
 	        // 
         	Query q = new Query().sql("group.currentStatus = 'ORDERED' LIMIT 1");
         	
-        	System.out.println("*****" +capi.test(tables));
+        	//System.out.println("*****" +capi.test(tables));
 
-            entries = capi.take(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.TRY_ONCE, tx);
             Table t = entries.get(0);
             Order o = t.getOrder();
             
-            System.out.println("----->  " +o.toString());
             
             o.setOrderstatus(OrderStatus.ORDERED);
             t.getGroup().setStatus(GroupStatus.ORDERONBAR);
@@ -158,14 +164,18 @@ public class RunWaiterSBC {
 		    Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
 			capi.write(orderEntry, bar,timeOut,tx);
 			
+            System.out.println("******----->  " +o.toString());
+
+			
 		    Entry tableEntry = new Entry(t, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(t.getId())), QueryCoordinator.newCoordinationData()));
 			capi.write(tableEntry, tables,timeOut,tx);
-			
+			capi.commitTransaction(tx);
+
 			
 		} catch ( Exception e) {
 			// AutoRollback
 			
-			e.printStackTrace();
+			printExp(e);
 		}finally{
         	working.set(false);
 		}
@@ -184,11 +194,11 @@ public class RunWaiterSBC {
 	        // query coordinator
         	Query qo = new Query().sql("status = 'COOKED' LIMIT 1");
 
-        	orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.INFINITE, tx);
+        	orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
             Order o = orders.get(0);
             
             
-            tablesArr = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(o.getId().toString(),1)) , RequestTimeout.INFINITE, tx);
+            tablesArr = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(o.getId().toString(),1)) , RequestTimeout.TRY_ONCE, tx);
             Table t = tablesArr.get(0);
             
             t.getGroup().setStatus(GroupStatus.EATING);
@@ -198,12 +208,13 @@ public class RunWaiterSBC {
             
 		    Entry tableEntry = new Entry(t, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(t.getId())), QueryCoordinator.newCoordinationData()));
 			capi.write(tableEntry, tables,timeOut,tx);
-			
+			capi.commitTransaction(tx);
+
 			
 		} catch ( Exception e) {
 			// AutoRollback
 			
-			e.printStackTrace();
+			printExp(e);
 		}finally{
         	working.set(false);
 		}
@@ -215,30 +226,41 @@ public class RunWaiterSBC {
 		TransactionReference tx;
         try {
         	working.set(true);
+        	
+        	//if(capi.test(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout., null)); 
+        	
         	tx = capi.createTransaction(timeOut, space);
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
 	        // query coordinator
         	Query q = new Query().sql("group.currentStatus = 'BILL' LIMIT 1");
 
-            entries = capi.read(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.INFINITE, tx);
+            entries = capi.read(tables, Arrays.asList(QueryCoordinator.newSelector(q)) , RequestTimeout.TRY_ONCE, tx);
             Table t = entries.get(0);
             Order o = t.getOrder();
           
-            // TODO: logging paid
-            System.out.println("Paid bill "+o.getId());
             
             
-            capi.delete(tables, Arrays.asList(QueryCoordinator.newSelector(q),KeyCoordinator.newSelector(t.getId().toString())), RequestTimeout.INFINITE, tx);
+            capi.delete(tables, Arrays.asList(QueryCoordinator.newSelector(q),KeyCoordinator.newSelector(t.getId().toString())), RequestTimeout.TRY_ONCE, tx);
 			
+            System.out.println("Paid bill "+o.getId());
+
+            
+            capi.commitTransaction(tx);
+
 			
 		} catch ( Exception e) {
 			// AutoRollback
-			
-			e.printStackTrace();
+			printExp(e);
 		}finally{
         	working.set(false);
 		}
+
+	}
+	
+	
+	public static void printExp(Exception e){
+		//e.printStackTrace();
 
 	}
 	

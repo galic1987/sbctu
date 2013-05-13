@@ -25,7 +25,8 @@ public class Cook extends Person{
 		//TODO
 		
 		for (Pizza p : o.getPizzaList()) {
-			Thread.sleep(p.getPrepareTime());
+			System.out.println("Cooking the pizza for sec " +p.getPrepareTime());
+			Thread.sleep(p.getPrepareTime()*1000);
 		}
       
       	o.setOrderstatus(OrderStatus.COOKED);

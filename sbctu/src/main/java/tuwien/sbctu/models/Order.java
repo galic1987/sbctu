@@ -99,7 +99,7 @@ public class Order implements Serializable{
 	}
 
 	public void setOrderstatus(OrderStatus orderstatus) {
-		this.status = orderstatus.toString();
+		this.status = orderstatus.toString().toUpperCase();
 		this.orderstatus = orderstatus;
 	}
 

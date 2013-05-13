@@ -29,6 +29,7 @@ import org.mozartspaces.util.parser.sql.javacc.ParseException;
 
 import tuwien.sbctu.conf.PizzeriaConfiguration;
 import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.Table;
 
 public class App2 {
 
@@ -87,12 +88,15 @@ public class App2 {
 		
         ArrayList<GuestGroup> entries = new ArrayList<GuestGroup>();
 
+        ArrayList<Table> tables = new ArrayList<Table>();
+
 		
 		for (;;) {
             // explicit TX to prevent possible loss of taken message when consumer is offline
             TransactionReference tx = capi.createTransaction(10000, space);
            
     		ContainerReference cref = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, 0, tx);
+    		ContainerReference creftab = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx);
 
 			// Take one entry
             try {
@@ -106,12 +110,23 @@ public class App2 {
             	tableCoords.add(new QueryCoordinator());
                 
                 
-                entries = capi.read(cref, Arrays.asList(QueryCoordinator.newSelector(q),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+                entries = capi.read(cref, Arrays.asList(FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+                
+                tables = capi.read(creftab, Arrays.asList(FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
+                
+                
+                
+                
+                
+                
+                
             } catch (MzsTimeoutException | ParseException ex) {
                 System.out.println("transaction timeout. retry.");
                 continue;
             }
-            GuestGroup message = entries.get(0);
+            GuestGroup message = entries.get(0);          
+            Table t = tables.get(0);
+
 
             // output
             System.out.println(message.getId());
