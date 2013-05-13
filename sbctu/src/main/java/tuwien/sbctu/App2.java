@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.mozartspaces.capi3.Coordinator;
@@ -96,8 +97,7 @@ public class App2 {
 			// Take one entry
             try {
             	
-            	Property groupSize = Property.forName("groupSize");
-            	Query q = new Query().sql("");
+            	Query q = new Query().sql("groupSize >= 3");
             	
             	ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
             	tableCoords.add(new FifoCoordinator());
@@ -105,7 +105,7 @@ public class App2 {
             	tableCoords.add(new QueryCoordinator());
                 
                 
-                entries = capi.take(cref, FifoCoordinator.newSelector(), RequestTimeout.INFINITE, tx);
+                entries = capi.read(cref, Arrays.asList(QueryCoordinator.newSelector(q),FifoCoordinator.newSelector()) , RequestTimeout.INFINITE, tx);
             } catch (MzsTimeoutException | ParseException ex) {
                 System.out.println("transaction timeout. retry.");
                 continue;

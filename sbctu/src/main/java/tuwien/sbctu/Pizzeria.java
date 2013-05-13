@@ -76,7 +76,8 @@ public class Pizzeria {
 		ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
         obligatoryCoords.add(new FifoCoordinator());
         obligatoryCoords.add(new KeyCoordinator());
-        
+        obligatoryCoords.add(new QueryCoordinator());
+
         
         ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
         tableCoords.add(new FifoCoordinator());

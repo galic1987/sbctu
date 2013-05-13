@@ -2,6 +2,9 @@ package tuwien.sbctu.models;
 
 import java.util.ArrayList;
 
+import org.mozartspaces.capi3.Queryable;
+
+@Queryable(autoindex=true)
 public class GuestGroup extends Person{
 
 	

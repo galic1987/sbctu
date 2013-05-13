@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.capi3.RandomCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -70,11 +72,14 @@ public class RunGuestSBC implements NotificationListener {
 		    tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, 0, tx2);
 
 		    
-		    Entry entry = new Entry(g, KeyCoordinator.newCoordinationData(String.valueOf(g.getId())));
-		    Entry entry2 = new Entry(g, KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+1)));
-
-			g.setStatus(GroupStatus.ENTERED);
+		    g.setStatus(GroupStatus.ENTERED);
+			g.setGroupSize(3);
 			
+
+			
+		    Entry entry = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId())), QueryCoordinator.newCoordinationData()));
+		    Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
+
 			
 			new RunGuestSBC();
 			

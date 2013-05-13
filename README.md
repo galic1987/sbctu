@@ -23,14 +23,24 @@ mvn clean
 
 
 To run with arguments run:
+====== SBC =======
+1. Start server:
+
+mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server" -Dexec.args="4242"
 
 
-Start app administration:
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.App2" -Dexec.args="arg1 arg2"
+2. Start programGUI (containers)
 
 
-Start core:
-mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server"
+3. Start guestgroups Procedure
+
+
+4. Start Cook
+
+
+5. Start Waiter
+
+
 
 
 ====== RMI =======
