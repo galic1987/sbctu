@@ -46,7 +46,7 @@ mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server" -Dexec.args="4242"
 ====== RMI =======
 RMI server on localhost port 10879 will be started automatically on RMI-bindingName "pizzeria"
 
-1. start "StartRMI.java" (no arguments)
+1. start "StartRMI.java" arguments: -numberOfTables
 2. start "StartGUI.java" (no arguments)
 3. start "StartWaiter.java" arguments: -waiterID -rmiPort -bindingName (i.e. 1 10879 pizzeria)
 4. start "StartCook.java" arguments: -cookID -rmiPort -bindingName (i.e. 2 10879 pizzeria)
