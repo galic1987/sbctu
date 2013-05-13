@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import tuwien.sbctu.models.Cook;
 import tuwien.sbctu.models.Cook.CookStatus;
 import tuwien.sbctu.models.GuestGroup;
-import tuwien.sbctu.models.LoggingRecorder;
 import tuwien.sbctu.models.Order;
 import tuwien.sbctu.models.Order.OrderStatus;
 import tuwien.sbctu.models.Pizza;
@@ -27,9 +26,8 @@ import tuwien.sbctu.rmi.interfaces.IPizzeriaRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
 
 public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
+	ILoggingRMI logrec;
 	
-	LoggingRecorder logrec = new LoggingRecorder();
-
 	Queue<GuestGroup> waitingEntry = new ConcurrentLinkedQueue<GuestGroup>();
 	List<GuestGroup> guests = new ArrayList<GuestGroup>();
 	
@@ -65,7 +63,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 		System.out.println("GuestGroup entered: "+group.getId());
 		subscriber.notification("* RMIPizzeria: Welcome!");
 		
-		logrec.insertGuestInfo("!entry "+group.getId()+" "+group.getGroupSize());
+//		logrec.insertGuestInfo("!entry "+group.getId()+" "+group.getGroupSize());
 	}
 	public void waiterWorkNotifier(String message){
 		for(IWaiterRMI iwr: iw){
@@ -438,7 +436,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeriaRMI{
 
 	@Override
 	public void subscribeGUI(ILoggingRMI logrmi) throws RemoteException {
-		// TODO Auto-generated method stub
+		this.logrec = logrmi;
 		
 	}
 }
