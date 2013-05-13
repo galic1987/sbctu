@@ -9,7 +9,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
+import org.mozartspaces.capi3.KeyCoordinator;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
@@ -89,6 +94,16 @@ public class App2 {
 
 			// Take one entry
             try {
+            	
+            	Property groupSize = Property.forName("groupSize");
+            	//Query q = new Query().sql("");
+            	
+            	ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
+            	tableCoords.add(new FifoCoordinator());
+            	tableCoords.add(new KeyCoordinator());
+            	tableCoords.add(new QueryCoordinator());
+                
+                
                 entries = capi.take(cref, FifoCoordinator.newSelector(), RequestTimeout.INFINITE, tx);
             } catch (MzsTimeoutException ex) {
                 System.out.println("transaction timeout. retry.");

@@ -71,6 +71,7 @@ public class RunGuestSBC implements NotificationListener {
 
 		    
 		    Entry entry = new Entry(g, KeyCoordinator.newCoordinationData(String.valueOf(g.getId())));
+		    Entry entry2 = new Entry(g, KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+1)));
 
 			g.setStatus(GroupStatus.ENTERED);
 			
@@ -80,6 +81,7 @@ public class RunGuestSBC implements NotificationListener {
 			//test shizzle
 			//capi.write(entrance, entry); 
 			capi.write(entrance, entry);
+			capi.write(entrance, entry2);
 
 
 			
