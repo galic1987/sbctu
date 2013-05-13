@@ -8,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
+import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
@@ -28,13 +30,15 @@ import tuwien.sbctu.conf.*;
 
 import tuwien.sbctu.models.*;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
+import tuwien.sbctu.rmi.PizzeriaGUI;
 
 public class Pizzeria implements NotificationListener {
 
 	
 	
 	
-	
+    final PizzeriaGUISBC pizz = new PizzeriaGUISBC();
+
 
 	private final MzsCore core;
 	private final Capi capi;
@@ -57,6 +61,10 @@ public class Pizzeria implements NotificationListener {
 	InterruptedException {
 		
 		
+		
+	        
+	        
+		
 		core = DefaultMzsCore.newInstance();
 		capi = new Capi(core);
 
@@ -73,11 +81,15 @@ public class Pizzeria implements NotificationListener {
 		ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
         obligatoryCoords.add(new FifoCoordinator());
         obligatoryCoords.add(new KeyCoordinator());
+        obligatoryCoords.add(new AnyCoordinator());
+
 
         
         ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
         tableCoords.add(new KeyCoordinator());
         tableCoords.add(new QueryCoordinator());
+        tableCoords.add(new AnyCoordinator());
+
 
 		
         // guest groups as objects
@@ -101,10 +113,37 @@ public class Pizzeria implements NotificationListener {
         Set<Operation> operations = new HashSet<Operation>();
         //operations.add(Operation.ALL);
         //operations.add(Operation.DELETE);
-       // manager.createNotification(tables, this, Operation.WRITE, null, null);
+        manager.createNotification(tables, this, Operation.WRITE, null, null);
+        manager.createNotification(entrance, this, Operation.WRITE, null, null);
        // manager.createNotification(tables, this, Operation.DELETE, null, null);
         manager.createNotification(bar, this, Operation.WRITE, null, null);
 
+        
+        
+        
+        
+        
+		   
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(PizzeriaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(PizzeriaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(PizzeriaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(PizzeriaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+     
+        pizz.setVisible(true);
+      //  pizz.subscribeToSBC();
+      //  pizz.updateFields();
 		
 	}
 	
@@ -113,19 +152,66 @@ public class Pizzeria implements NotificationListener {
 	@Override
 	public void entryOperationFinished(Notification arg0, Operation arg1,
 			List<? extends Serializable> arg2) {
-		for (Serializable entry : arg2) {
+		//for (Serializable entry : arg2) {
 			
 			
 			
-			Order o = (Order) ((Entry) entry).getValue();
+		//	Order o = (Order) ((Entry) entry).getValue();
 				
-	            System.out.println("--> Notification: ID " + o.getStatus() + " " + arg1.toString());
+	            System.out.println("--> Notification: ID " + arg2.toString() + " " + arg1.toString());
+
+	            
+	            
+	            
+	            
+	            
+	            // read all relevant data
+		        ArrayList<Order> orders = new ArrayList<Order>();
+		        ArrayList<Table> tablesArr = new ArrayList<Table>();
+		        ArrayList<GuestGroup> guestsEntry = new ArrayList<GuestGroup>();
+
+	            
+	            // put it to gui
+		        try {
+					orders = capi.read(bar,new FifoCoordinator().newSelector(Selector.COUNT_ALL),0,null);
+					
+					// update the gui
+					
+				} catch (MzsCoreException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
+		        
+		        try {
+					tablesArr = capi.read(tables);
+					
+					// update the gui
+					
+				} catch (MzsCoreException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
+		        
+		        try {
+				
+					guestsEntry = capi.read(entrance);
+					
+					// update the gui
+					
+				} catch (MzsCoreException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
+		        
+		        
+		        
+				pizz.updateFields(orders, tablesArr, guestsEntry);
 
 				
 			// TODO: here can we get all notficications and append them to the gui interface
 			
             
-        }		
+      //  }		
 		
 	}
 		

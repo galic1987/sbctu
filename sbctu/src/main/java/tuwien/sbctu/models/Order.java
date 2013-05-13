@@ -8,6 +8,12 @@ import org.mozartspaces.capi3.Queryable;
 @Queryable(autoindex=true)
 public class Order implements Serializable{
 
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", pizzaList=" + pizzaList
+				+ ", orderstatus=" + orderstatus + ", status=" + status + "]";
+	}
+
 	/**
 	 * 
 	 */

@@ -7,6 +7,13 @@ import org.mozartspaces.capi3.Queryable;
 @Queryable(autoindex=true)
 public class Pizza implements Serializable{
 
+	@Override
+	public String toString() {
+		return "Pizza [name=" + name + ", price=" + price + ", prepareTime="
+				+ prepareTime + ", status=" + status + ", cookId=" + cookId
+				+ "]";
+	}
+
 	/**
 	 * 
 	 */

@@ -8,6 +8,12 @@ import org.mozartspaces.capi3.Queryable;
 @Queryable(autoindex=true)
 public class Table implements Serializable{
 
+	@Override
+	public String toString() {
+		return "Table [id=" + id  + ", order=" + order + ", bill=" + bill + ", group="
+				+ group + ", requestBill=" + requestBill + "]";
+	}
+
 	/**
 	 * 
 	 */
