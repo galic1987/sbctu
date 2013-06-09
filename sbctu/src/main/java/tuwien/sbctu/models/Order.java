@@ -2,6 +2,7 @@ package tuwien.sbctu.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.mozartspaces.capi3.Queryable;
 
@@ -13,6 +14,18 @@ public class Order implements Serializable{
 		return "Order [id=" + id + ", pizzaList=" + pizzaList
 				+ ", orderstatus=" + orderstatus + ", status=" + status + "]";
 	}
+        
+        public String pizzaList(){
+            String result= "";
+            
+            Iterator<Pizza> it = pizzaList.iterator();
+            while(it.hasNext()){
+                Pizza pz = it.next();
+                result += pz.getName() + " \n";
+            }
+            System.out.println(result);
+            return result;
+        }
 
 	/**
 	 * 

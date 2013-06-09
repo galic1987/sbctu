@@ -20,6 +20,7 @@ public class GuestGroup extends Person{
 	private int groupSize;
 	private GroupStatus gStatus;
 	private String currentStatus;
+        private Order order;
 
 	public Long getId() {
 		// TODO Auto-generated method stub
@@ -88,6 +89,14 @@ public class GuestGroup extends Person{
 	public void setCurrentStatus(String currentStatus) {
 		this.currentStatus = currentStatus;
 	}
+        
+        public Order getOrder() {
+            return order;
+        }
+        
+        public void setOrder(Order order) {
+            this.order = order;
+        }
 
 	public enum GroupStatus {
 

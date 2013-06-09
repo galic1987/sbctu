@@ -2,8 +2,13 @@ package tuwien.sbctu.rmi.implement;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
+import tuwien.sbctu.models.GuestDelivery;
+import tuwien.sbctu.models.GuestGroup;
 
 import tuwien.sbctu.models.LoggingRecorder;
+import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Table;
 import tuwien.sbctu.rmi.interfaces.ILoggingRMI;
 
 public class LoggingRMIImpl extends UnicastRemoteObject implements ILoggingRMI{
@@ -113,5 +118,45 @@ public class LoggingRMIImpl extends UnicastRemoteObject implements ILoggingRMI{
 		// TODO Auto-generated method stub
 		System.out.println("SERVER: HIIIIII");
 	}
+
+    @Override
+    public List<GuestDelivery> getGd() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setGd(List<GuestDelivery> gd) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<GuestGroup> getGg() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setGg(List<GuestGroup> gg) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Table> getTables() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setTables(List<Table> gd) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Order> getOrders() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setOrders(List<Order> gg) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }

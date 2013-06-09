@@ -2,9 +2,24 @@ package tuwien.sbctu.rmi.interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
+import tuwien.sbctu.models.GuestDelivery;
+import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Table;
 
 public interface ILoggingRMI extends Remote{
 	
+        public List<GuestDelivery> getGd() throws RemoteException;
+    public void setGd(List<GuestDelivery> gd) throws RemoteException;
+    public List<GuestGroup> getGg() throws RemoteException;
+    public void setGg(List<GuestGroup> gg) throws RemoteException;
+    
+    public List<Table> getTables() throws RemoteException;
+    public void setTables(List<Table> gd) throws RemoteException;
+    public List<Order> getOrders() throws RemoteException;
+    public void setOrders(List<Order> gg) throws RemoteException;
+    
 	public void guestInfo(String message) throws RemoteException;
 	public void waiterInfo(String message) throws RemoteException;
 	public void cookInfo(String message) throws RemoteException;
