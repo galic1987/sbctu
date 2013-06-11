@@ -1,7 +1,5 @@
 package tuwien.sbctu;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tuwien.sbctu.gui.GUIGuests;
 import tuwien.sbctu.gui.GuestGUIImpl;
 import tuwien.sbctu.gui.IGuestGUI;

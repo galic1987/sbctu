@@ -283,9 +283,9 @@ public class GUIGuests extends javax.swing.JFrame {
         else if(delivery){
 //            tuwien.sbctu.gui.tablemodels.DeliveryTableModel gtm = new tuwien.sbctu.gui.tablemodels.DeliveryTableModel();
             for(int i = 0; i < Integer.valueOf(txtOthers.getText());i++){
-                GuestDelivery gd = new GuestDelivery(new Long(i+100));
+            GuestDelivery gd = new GuestDelivery(new Long(i+100));
 //                gg.setGroupSize(Integer.valueOf(txtSize.getText()));
-                gd.setStatus(GuestDelivery.DeliveryStatus.ORDERED);
+                gd.setStatus(GuestDelivery.DeliveryStatus.DELIVERY);
                 gd.setOrder(prepareOrder());
 //                gtm.add(gd);    
                 guestTableInformation.setDeliveryInfo(gd);

@@ -58,7 +58,7 @@ public class Order implements Serializable{
 	}
 
 	public enum OrderStatus {
-		ORDERED, PROCESSING, COOKED, SERVING, PAID;
+		ORDERED, PROCESSING, COOKED, SERVING, PAID, DELIVERYNEW, DELIVERYTRANSFERRED, DELIVERYCOOKING, DELIVERYFINISHED;
 		
 		public String toString(){
 			return super.toString().toLowerCase();
