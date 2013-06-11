@@ -22,12 +22,7 @@ import org.mozartspaces.core.MzsConstants.RequestTimeout;
 
 import tuwien.sbctu.conf.PizzeriaConfiguration;
 import tuwien.sbctu.models.Cook;
-import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
-import tuwien.sbctu.models.Pizza;
-import tuwien.sbctu.models.Table;
-import tuwien.sbctu.models.Waiter;
-import tuwien.sbctu.models.GuestGroup.GroupStatus;
 import tuwien.sbctu.models.Order.OrderStatus;
 
 public class RunCookSBC {
