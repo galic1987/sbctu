@@ -96,7 +96,7 @@ public class RunWaiterSBC implements NotificationListener{
 
 
 			for (;;) {
-
+				try {
 				System.out.println("-----> Starting all over again");
 
 				if(checkTheDeliveryOrders()) continue;
@@ -114,7 +114,7 @@ public class RunWaiterSBC implements NotificationListener{
 
 
 				// sleep for a while, it is hard day
-				try {
+				
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block

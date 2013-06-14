@@ -122,7 +122,7 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 	        NotificationManager notifManager = new NotificationManager(core);
 	        Set<Operation> operations = new HashSet<Operation>();
 	        operations.add(Operation.WRITE);
-	        notifManager.createNotification(deliveryContainer, this, operations, null, null);
+	       notifManager.createNotification(deliveryContainer, this, operations, null, null);
 
 
 			

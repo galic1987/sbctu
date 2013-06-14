@@ -85,6 +85,8 @@ public class RunCookSBC implements NotificationListener {
 
 
 			for (;;) {
+				
+				try {
 				// take order and start cooking  
 				if(cookForDeliveryTransferPriority()) continue; // if there is transfered delivery, 
 				if(cookForDelivery()) continue; // if there is delivery, try to cook for delivery again
@@ -92,7 +94,7 @@ public class RunCookSBC implements NotificationListener {
 				cook();// othervise cook normal orders
 				
 				// when finished put it to theke
-				try {
+				
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
