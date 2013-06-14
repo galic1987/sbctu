@@ -67,7 +67,7 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 	private  ArrayList<Pizza> pizz = null;
 	
 	 
-	public RunDeliveryGuestSBC(int porta,long ida, String spaceAddressa){
+	public RunDeliveryGuestSBC(int porta,long ida, String spaceAddressa, ArrayList<Pizza> pizza){
 
 		// TODO Auto-generated method stub
 		
@@ -76,6 +76,7 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 		int port = porta;
 	    id = ida;
 		spaceAddress = spaceAddressa;
+		pizz = pizza;
 		
 		deliveryAddress = new DeliveryAddress(spaceAddress, nextSessionId());
 		
@@ -96,11 +97,13 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 
 			delivery = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, 1000, tx);
 			
-			capi.createContainer(deliveryAddress.getContainerName(), space, 10, tx );
+			deliveryContainer = capi.createContainer(deliveryAddress.getContainerName(), space, 1000, tx );
 			
+
 			Order o = new Order();
 			o.setId(id);
 			o.setPizzaList(pizz);
+			o.setDeliveryAddress(deliveryAddress);
 			
 			
 		    Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));
@@ -114,7 +117,7 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 			
 			capi.commitTransaction(tx);
 			//capi.write(entrance, entry2);
-			
+			System.out.println("Writing order with id"+id);
 			// Create notification
 	        NotificationManager notifManager = new NotificationManager(core);
 	        Set<Operation> operations = new HashSet<Operation>();
@@ -151,25 +154,6 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 	}
 	
 	
-	
-
-	
-
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		//main(indirectArgs);
-	}
-	
-	public String[] getIndirectArgs() {
-		return indirectArgs;
-	}
-
-
-	public void setIndirectArgs(String[] indirectArgs) {
-		this.indirectArgs = indirectArgs;
-	}
 	
 
 	public  String nextSessionId()

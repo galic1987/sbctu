@@ -24,48 +24,55 @@ mvn clean
 
 To run with arguments run:
 ====== SBC =======
-1. Start server:
+Start servers
+mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server" -Dexec.args="5100"
 
-mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server" -Dexec.args="4242"
-
-
-2. Start programGUI (containers)
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.App" -Dexec.args=""
-
-
-3. Start guestgroups Procedure
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunGuestSBC" -Dexec.args="1500 51802"
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunGuestSBC" -Dexec.args="1501 51812"
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunGuestSBC" -Dexec.args="1502 51822"
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunGuestSBC" -Dexec.args="1503 51832"
-
-
-4. Start Cook
-
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RuookSBC" -Dexec.args="1205 5102"
-
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RuookSBC" -Dexec.args="1206 5112"
+mvn exec:java -Dexec.mainClass="org.mozartspaces.core.Server" -Dexec.args="5101"
 
 
 
-
-5. Start Waiter
-
-
-mvn exec:java -Dexec.mainClass="tien.sbctu.runtime.RunWaiterSBC" -Dexec.args="1303 51112"
+Start environment (2 pizzeria and 1 LoadBalancer)
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.App" -Dexec.args="5100 5101" 
 
 
-mvn exec:java -Dexec.mainClass="tien.sbctu.runtime.RunWaiterSBC" -Dexec.args="1301 4214"
+Start Waiters
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunWaiterSBC" -Dexec.args="6151 99 xvsm://localhost:5100"
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunWaiterSBC" -Dexec.args="6152 98 xvsm://localhost:5100"
+
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunWaiterSBC" -Dexec.args="6153 97 xvsm://localhost:5101"
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunWaiterSBC" -Dexec.args="6154 96 xvsm://localhost:5101"
+
+
+
+Start Cooks
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunCookSBC" -Dexec.args="6161 89 xvsm://localhost:5100" 
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunCookSBC" -Dexec.args="6162 88 xvsm://localhost:5100"
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunCookSBC" -Dexec.args="6163 87 xvsm://localhost:5101"
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunCookSBC" -Dexec.args="6164 86 xvsm://localhost:5101"
+
+
+Start Drivers
+
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunDriverSBC" -Dexec.args="6171 79 xvsm://localhost:5100"
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunDriverSBC" -Dexec.args="6172 78 xvsm://localhost:5100"
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunDriverSBC" -Dexec.args="6173 77 xvsm://localhost:5101"
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.runtime.RunDriverSBC" -Dexec.args="6174 76 xvsm://localhost:5101"
 
 
 
 
+
+Start Simulation1 (100 Pizza)
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation1" -Dexec.args="6001 17 xvsm://localhost:5100"
+
+Start Simulation2 (200 Pizza total)
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation2" -Dexec.args="6002 18 xvsm://localhost:5101"
 ====== RMI =======
 RMI server on localhost port 10879 will be started automatically on RMI-bindingName "pizzeria"
 

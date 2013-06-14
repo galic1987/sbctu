@@ -64,7 +64,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 			 core = DefaultMzsCore.newInstance(port);
 	         capi = new Capi(core);
 	         
-	         timeOut = 10000;
+	         timeOut = 15000;
 	         
 	         working = new AtomicBoolean();
 	         working.set(false);
@@ -82,10 +82,10 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		        
 	            TransactionReference tx = capi.createTransaction(timeOut, space);
 
-				archive = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, 1000, tx);
-			    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, 1000, tx);
+				archive = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, RequestTimeout.INFINITE, tx);
+			    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, RequestTimeout.INFINITE, tx);
 
-			    
+			    System.out.print("fas");
 			    //g.setStatus(GroupStatus.ENTERED);
 				//g.setGroupSize(3);
 				
@@ -132,10 +132,10 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		@Override
 		public void entryOperationFinished(Notification arg0, Operation arg1,
 				List<? extends Serializable> arg2) {
-	        //System.out.println("> Notification: ID" +arg2.toString() + " " + arg1.toString());
+	       // System.out.println("> Notification: ID" +arg2.toString() + " " + arg1.toString());
 
 			// if working throw it away
-	        if(working.get()) return;
+	        if(working.get()==true) return;
 	        working.set(true);
 	        try{
 	        	
@@ -145,19 +145,20 @@ import tuwien.sbctu.models.Order.OrderStatus;
 	        //for (Serializable entry : arg2) {
 				Order o = (Order) ((Entry) iterator.next()).getValue();
 				//Order o = t.getGroup();
-	            //System.out.println("--> Notification: ID" +g.getId() + " " + arg1.toString());
 				
-				if(arg1.equals(Operation.WRITE)){
 					
 		           // System.out.println("Status "+ g.getStatus().toString()+  " ID " +g.getId() );
 
+				
 				  // take the pizza now if finished
-					if(o.getStatus().equals(OrderStatus.DELIVERYCOOKED)){
+					if(o.getOrderstatus().equals(OrderStatus.DELIVERYCOOKED)){
+			            System.out.println("--> Notification: ID" +o.toString());
+
 						tryToDeliverAndPutInArchive();
 					}
 		        	 
 		        	 
-				}
+				
 				
 	            
 	        }	
@@ -176,7 +177,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 			TransactionReference tx;
 			Order o = null;
 			try {
-				
+				System.out.println("Trying to deliver");
 				tx = capi.createTransaction(timeOut, space);
 				ArrayList<Order> orders = new ArrayList<Order>();
 
@@ -206,16 +207,19 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				
 				
 				// write in archive if delivered or not
+				Entry orderEntry1 = new Entry(o);
 				Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
 				
-				capi.write(orderEntry, deliveryAddress,timeOut,null); 
+				capi.write(orderEntry1, deliveryAddress,timeOut,null); 
 				capi.write(orderEntry, archive,timeOut,null);
 
 				// everything ok proceed
+				System.out.println("Delivered order with id " + o.getId() + " bill " + o.writeBill() + " trying to deliver");
 
 				
 
 			} catch ( Exception e) {
+				e.printStackTrace();
 				try{
 				// write in archive not delivered 
 					

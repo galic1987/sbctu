@@ -81,7 +81,7 @@ public class Pizzeria implements NotificationListener {
 		org.mozartspaces.core.Server.main(p1) ;
 
 
-		core = DefaultMzsCore.newInstance();
+		core = DefaultMzsCore.newInstance(port+199);
 		capi = new Capi(core);
 
 		try {
@@ -124,11 +124,11 @@ public class Pizzeria implements NotificationListener {
 
 		
 		// delivery queue (telephone)
-		delivery = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
+		delivery = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, MzsConstants.Container.UNBOUNDED, obligatoryCoords, 
 				null,null);
 
 		// archive for log
-		archive = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, MzsConstants.Container.UNBOUNDED, obligatoryCoords, 
+		archive = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
 				null,null);
 		
 		//System.out.println(delivery.getId().equals(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY));
@@ -137,7 +137,6 @@ public class Pizzeria implements NotificationListener {
 
 		// Create notification
 		manager = new NotificationManager(core);
-		Set<Operation> operations = new HashSet<Operation>();
 		//operations.add(Operation.ALL);
 		//operations.add(Operation.DELETE);
 		manager.createNotification(tables, this, Operation.WRITE, null, null);
@@ -185,7 +184,7 @@ public class Pizzeria implements NotificationListener {
 
 		//	Order o = (Order) ((Entry) entry).getValue();
 
-		System.out.println("--> Notification: ID " + arg2.toString() + " " + arg1.toString());
+		//System.out.println("--> Notification: ID " + arg0.getNotificationContainer().toString() + " \n " + arg2.toString() );
 
 
 
@@ -293,8 +292,8 @@ public class Pizzeria implements NotificationListener {
 
 		} catch ( Exception e) {
 			// AutoRollback
-
-			//printExp(e);
+			load = 0;
+			//e.printStackTrace();
 		}finally{
 			//working.set(false);
 		}

@@ -21,6 +21,7 @@ import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.Request;
 import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.notifications.Notification;
@@ -84,8 +85,12 @@ public class RunCookSBC implements NotificationListener {
 
 
 			for (;;) {
-				// take order and start cooking 
-				cook();
+				// take order and start cooking  
+				if(cookForDeliveryTransferPriority()) continue; // if there is transfered delivery, 
+				if(cookForDelivery()) continue; // if there is delivery, try to cook for delivery again
+				
+				cook();// othervise cook normal orders
+				
 				// when finished put it to theke
 				try {
 					Thread.sleep(5000);
@@ -148,6 +153,87 @@ public class RunCookSBC implements NotificationListener {
 
 	}
 
+	public static boolean cookForDelivery(){
+
+
+		TransactionReference tx;
+		try {
+			working.set(true);
+			tx = capi.createTransaction(RequestTimeout.INFINITE, space);
+			ArrayList<Order> orders = new ArrayList<Order>();
+
+			// query coordinator
+			Query qo = new Query().sql("status = 'DELIVERYNEW' LIMIT 1");
+			
+			orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
+			Order o = orders.get(0);
+			System.out.println(o.toString());
+			//            for (Pizza p : o.getPizzaList()) {
+			c.cookPizzasFromOrder(o);
+			//Thread.sleep(p.getPrepareTime());
+			//			}
+			o.setOrderstatus(OrderStatus.DELIVERYCOOKED);
+
+
+
+
+			Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
+			capi.write(orderEntry, bar,RequestTimeout.TRY_ONCE,tx);
+			capi.commitTransaction(tx);
+			return true;
+
+		} catch ( Exception e) {
+			// AutoRollback
+
+			//e.printStackTrace();
+			return false;
+		}finally{
+			working.set(false);
+		}
+
+	}
+	
+	public static boolean cookForDeliveryTransferPriority(){
+
+
+		TransactionReference tx;
+		try {
+			working.set(true);
+			tx = capi.createTransaction(RequestTimeout.INFINITE, space);
+			ArrayList<Order> orders = new ArrayList<Order>();
+
+			// query coordinator
+			Query qo = new Query().sql("status = 'DELIVERYTRANSFERRED' LIMIT 1");
+			
+			orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
+			Order o = orders.get(0);
+			System.out.println(o.toString());
+			//            for (Pizza p : o.getPizzaList()) {
+			c.cookPizzasFromOrder(o);
+			//Thread.sleep(p.getPrepareTime());
+			//			}
+			o.setOrderstatus(OrderStatus.DELIVERYCOOKED);
+
+
+
+
+			Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
+			capi.write(orderEntry, bar,RequestTimeout.TRY_ONCE,tx);
+			capi.commitTransaction(tx);
+			return true;
+
+		} catch ( Exception e) {
+			// AutoRollback
+
+			//e.printStackTrace();
+			return false;
+		}finally{
+			working.set(false);
+		}
+
+	}
+	
+	
 	public RunCookSBC() throws MzsCoreException, InterruptedException{
 		// Create notification
 		NotificationManager notifManager = new NotificationManager(core);

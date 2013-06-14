@@ -1,7 +1,13 @@
 package tuwien.sbctu.models;
 
-public class DeliveryAddress {
+import java.io.Serializable;
 
+public class DeliveryAddress implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String spaceAddress;
 	private String containerName;
 	

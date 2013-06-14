@@ -12,11 +12,13 @@ import tuwien.sbctu.models.Order;
  */
 public class App 
 {
-	private static Pizzeria[] p = new Pizzeria[10];
+	private static Pizzeria[] p;
 
 	public static void main( String[] args )
 	{
 		//System.out.println( "Hello World!" + args );
+		
+		p = new Pizzeria[args.length];
 		for (int i = 0; i < args.length; i++) { 
 			try {
 				int port = Integer.valueOf(args[i]);
@@ -24,7 +26,7 @@ public class App
 
 			} catch (MzsCoreException | InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 
@@ -38,6 +40,7 @@ public class App
 	}
 
 	public static void algo(){
+		System.out.println("Loadbalancer started!");
 		boolean everythingOK = true;
 		while(true){
 
@@ -53,18 +56,23 @@ public class App
 				if(maxLoad == null) maxLoad = pizz;
 
 				// differences
-				if(minLoad.calculatePizzeriaLoad() > pizz.getLoad())
+				if(minLoad.getLoad() > pizz.getLoad())
 					minLoad = pizz;
 
-				if(maxLoad.calculatePizzeriaLoad() < pizz.getLoad())
+				if(maxLoad.getLoad() < pizz.getLoad())
 					maxLoad = pizz;
 
 
 
 			}
 
+			
 
 			int difference = (int) ((int) maxLoad.getLoad()-minLoad.getLoad());
+			
+			System.out.println("Loadbalancer calculating!");
+
+			
 			// check if there is something to do , number of newDeliveries orders
 			if(difference >= 2){
 				// transfer order and immediately do recalculation
@@ -95,10 +103,11 @@ public class App
 
 
 			try {
+
 				if(everythingOK) Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

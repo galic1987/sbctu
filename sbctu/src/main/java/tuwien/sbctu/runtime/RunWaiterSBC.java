@@ -99,6 +99,9 @@ public class RunWaiterSBC implements NotificationListener{
 
 				System.out.println("-----> Starting all over again");
 
+				if(checkTheDeliveryOrders()) continue;
+
+				
 				// 1. entrance check -> check entrance, and bring the guestgroups to table -> make table
 				entranceTake();
 				// 2. tables -> if order ORDERED -> put it on the theke -> status ORDERONBAR
@@ -108,7 +111,6 @@ public class RunWaiterSBC implements NotificationListener{
 				// 4. if there BILL request read it -> log it and delete it		
 				doTheBilling();
 				// 5. take the deliveries to bar
-				checkTheDeliveryOrders();
 
 
 				// sleep for a while, it is hard day
@@ -281,7 +283,7 @@ public class RunWaiterSBC implements NotificationListener{
 	}
 
 
-	public static void checkTheDeliveryOrders(){
+	public static boolean checkTheDeliveryOrders(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -301,11 +303,13 @@ public class RunWaiterSBC implements NotificationListener{
 			}
 			
 			capi.commitTransaction(tx);
-
+			return true;
 		} catch ( Exception e) {
 			// AutoRollback
+			e.printStackTrace();
 
-			printExp(e);
+			return false;
+			//printExp(e);
 		}finally{
 			working.set(false);
 		}	
