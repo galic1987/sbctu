@@ -1,6 +1,7 @@
 package tuwien.sbctu.runtime;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
 
-public class RunGuestSBC implements NotificationListener,Runnable {
+public class RunGuestSBC implements NotificationListener {
 
 	/**
 	 * @param args[0] - int port unique 
@@ -44,33 +45,34 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 	 * 
 	 */
 	
-	protected static long id;
-	protected static MzsCore core;
-	protected static Capi capi;
-	protected static URI space;
-	protected static ContainerReference entrance;
-	protected static ContainerReference tables;
-	protected static GuestGroup g;
+	protected  long id;
+	protected  MzsCore core;
+	protected  Capi capi;
+	protected  URI space;
+	protected  ContainerReference entrance;
+	protected  ContainerReference tables;
+	protected  GuestGroup g;
 	
 	
-	protected static AtomicBoolean working;
-	protected static int timeOut;
-	protected static String spaceAddress;
+	protected  AtomicBoolean working;
+	protected  int timeOut;
+	protected  String spaceAddress;
+	private  ArrayList<Pizza> pizz = null;
 
 	
-	private  String [] indirectArgs = null;
 	
 	
 
 
-	public static void main(String[] args) {
+	public RunGuestSBC(int porta,long ida, String spaceAddressa){
+
 		// TODO Auto-generated method stub
 		
         try {
 
-		int port = Integer.valueOf(args[0]);
-	    id = (long)Integer.valueOf(args[1]);
-		spaceAddress = args[2];
+		int port = porta;
+	    id = ida;
+		spaceAddress = spaceAddressa;
 
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);
@@ -107,13 +109,17 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 		  //Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
 
 			
-			new RunGuestSBC();
 			
 			//test shizzle
 			//capi.write(entrance, entry); 
 			capi.write(entrance, entry);
 			//capi.write(entrance, entry2);
 
+			 NotificationManager notifManager = new NotificationManager(core);
+		        Set<Operation> operations = new HashSet<Operation>();
+		        operations.add(Operation.WRITE);
+		        operations.add(Operation.DELETE);
+		        notifManager.createNotification(tables, this, operations, null, null);
 
 			
 		} catch (URISyntaxException | MzsCoreException | InterruptedException e) {
@@ -131,14 +137,7 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 	}
 	
 	
-	public RunGuestSBC() throws MzsCoreException, InterruptedException{
-		// Create notification
-        NotificationManager notifManager = new NotificationManager(core);
-        Set<Operation> operations = new HashSet<Operation>();
-        operations.add(Operation.WRITE);
-        operations.add(Operation.DELETE);
-        notifManager.createNotification(tables, this, operations, null, null);
-	}
+	
 
 	@Override
 	public void entryOperationFinished(Notification arg0, Operation arg1,
@@ -192,7 +191,7 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 	}
 	
 	
-	public static void makeOrder(){
+	public  void makeOrder(){
 		TransactionReference tx;
         try {
         	working.set(true);
@@ -230,7 +229,7 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 	}
 
 	
-	public static void demandBill(){
+	public  void demandBill(){
 		TransactionReference tx;
         try {
         	working.set(true);
@@ -264,20 +263,17 @@ public class RunGuestSBC implements NotificationListener,Runnable {
 	}
 
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		main(indirectArgs);
-	}
-	
-	public String[] getIndirectArgs() {
-		return indirectArgs;
+
+	public  ArrayList<Pizza> getPizz() {
+		return pizz;
 	}
 
 
-	public void setIndirectArgs(String[] indirectArgs) {
-		this.indirectArgs = indirectArgs;
+	public  void setPizz(ArrayList<Pizza> pizz) {
+		this.pizz = pizz;
 	}
+
+
 
 
 }

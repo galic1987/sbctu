@@ -39,7 +39,7 @@ import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
 
-public class RunDeliveryGuestSBC implements NotificationListener,Runnable {
+public class RunDeliveryGuestSBC implements NotificationListener {
 
 	/**
 	 * @param args[0] - int port unique 
