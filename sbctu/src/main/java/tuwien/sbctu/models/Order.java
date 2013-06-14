@@ -43,7 +43,10 @@ public class Order implements Serializable{
 	private Long waiterOrderTookId;
 	private Long waiterServedId;
 	private Long waiterBillProcessedId;
+	private Long driverId;
+
 	
+	private DeliveryAddress deliveryAddress;
 	
 	private String status;
 	
@@ -58,7 +61,7 @@ public class Order implements Serializable{
 	}
 
 	public enum OrderStatus {
-		ORDERED, PROCESSING, COOKED, SERVING, PAID, DELIVERYNEW, DELIVERYTRANSFERRED, DELIVERYCOOKING, DELIVERYFINISHED;
+		ORDERED, PROCESSING, COOKED, SERVING, PAID, DELIVERYNEW, DELIVERYTRANSFERRED, DELIVERYCOOKING, DELIVERYFINISHED, DELIVERYCOOKED, DELIVERYFAILED;
 		
 		public String toString(){
 			return super.toString().toLowerCase();
@@ -107,7 +110,14 @@ public class Order implements Serializable{
 	}
 	
 	
-	
+	public double writeBill(){
+		double price = 0.0;
+		for(Pizza p : pizzaList){
+			price += p.getPrice();
+		}
+		
+	return price;
+	}
 
 	public ArrayList<Pizza> getPizzaList() {
 		return pizzaList;
@@ -152,6 +162,22 @@ public class Order implements Serializable{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public DeliveryAddress getDeliveryAddress() {
+		return deliveryAddress;
+	}
+
+	public void setDeliveryAddress(DeliveryAddress deliveryAddress) {
+		this.deliveryAddress = deliveryAddress;
+	}
+
+	public Long getDriverId() {
+		return driverId;
+	}
+
+	public void setDriverId(Long driverId) {
+		this.driverId = driverId;
 	}
 	
 }

@@ -55,7 +55,7 @@ public class Pizzeria implements NotificationListener {
 	private ContainerReference tables;
 	private ContainerReference bar;
 	private ContainerReference delivery;
-
+	private ContainerReference archive;
 
 	private double load;
 	private long timeOut = 10000;
@@ -127,6 +127,9 @@ public class Pizzeria implements NotificationListener {
 		delivery = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
 				null,null);
 
+		// archive for log
+		archive = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, MzsConstants.Container.UNBOUNDED, obligatoryCoords, 
+				null,null);
 		
 		//System.out.println(delivery.getId().equals(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY));
 		
