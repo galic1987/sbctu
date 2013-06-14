@@ -42,7 +42,7 @@ public class Pizzeria implements NotificationListener {
 
 
 
-	final PizzeriaGUISBC pizz = new PizzeriaGUISBC();
+	//final PizzeriaGUISBC pizz = new PizzeriaGUISBC();
 
 
 	private final MzsCore core;
@@ -167,7 +167,7 @@ public class Pizzeria implements NotificationListener {
 			java.util.logging.Logger.getLogger(PizzeriaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
 
-		pizz.setVisible(true);
+		//pizz.setVisible(true);
 		//  pizz.subscribeToSBC();
 		//  pizz.updateFields();
 
@@ -231,7 +231,7 @@ public class Pizzeria implements NotificationListener {
 
 
 
-		pizz.updateFields(orders, tablesArr, guestsEntry);
+		//pizz.updateFields(orders, tablesArr, guestsEntry);
 
 
 		// TODO: here can we get all notficications and append them to the gui interface
