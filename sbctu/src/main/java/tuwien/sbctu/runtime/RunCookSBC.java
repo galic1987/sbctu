@@ -1,9 +1,13 @@
 package tuwien.sbctu.runtime;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.mozartspaces.capi3.Coordinator;
@@ -19,13 +23,17 @@ import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
+import org.mozartspaces.notifications.Notification;
+import org.mozartspaces.notifications.NotificationListener;
+import org.mozartspaces.notifications.NotificationManager;
+import org.mozartspaces.notifications.Operation;
 
 import tuwien.sbctu.conf.PizzeriaConfiguration;
 import tuwien.sbctu.models.Cook;
 import tuwien.sbctu.models.Order;
 import tuwien.sbctu.models.Order.OrderStatus;
 
-public class RunCookSBC {
+public class RunCookSBC implements NotificationListener {
 
 	/**
 	 * @param args
@@ -137,7 +145,25 @@ public class RunCookSBC {
 
 	}
 	
-	
+	public RunCookSBC() throws MzsCoreException, InterruptedException{
+		// Create notification
+        NotificationManager notifManager = new NotificationManager(core);
+        Set<Operation> operations = new HashSet<Operation>();
+        operations.add(Operation.WRITE);
+        notifManager.createNotification(bar, (NotificationListener) this, operations, null, null);
+	}
+
+	@Override
+	public void entryOperationFinished(Notification arg0, Operation arg1,
+			List<? extends Serializable> arg2) {
+		// TODO Auto-generated method stub
+		if(working.get() == true) return;
+		
+			cook();
+		
+		
+		
+	}
 		
 
 }

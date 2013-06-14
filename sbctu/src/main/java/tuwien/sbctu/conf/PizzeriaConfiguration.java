@@ -7,6 +7,8 @@ public class PizzeriaConfiguration {
 	public static final String CONTAINER_NAME_BAR = "bar";
 	public static final String CONTAINER_NAME_ENTRANCE = "entrance";
 	
+	public static  String CONTAINER_NAME_DELIVERY = "delivery";
+
 
 
 }

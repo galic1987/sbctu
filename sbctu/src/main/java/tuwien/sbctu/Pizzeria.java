@@ -54,11 +54,14 @@ public class Pizzeria implements NotificationListener {
 	private ContainerReference entrance;
 	private ContainerReference tables;
 	private ContainerReference bar;
+	private ContainerReference delivery;
 
 
 	private double load;
 	private long timeOut = 10000;
 
+	
+	private String address = "";
 
 	// 3 containers
 	//	private final FifoContainerXvsm<GuestGroup> entranceContainer;
@@ -70,14 +73,11 @@ public class Pizzeria implements NotificationListener {
 	public Pizzeria(int port) throws MzsCoreException,
 	InterruptedException {
 
-
-
-
 		String portString = String.valueOf(port);
 		String p1[] = new String [1];
 		p1[0] = portString;
 
-		// Server start
+		// Space start
 		org.mozartspaces.core.Server.main(p1) ;
 
 
@@ -85,6 +85,7 @@ public class Pizzeria implements NotificationListener {
 		capi = new Capi(core);
 
 		try {
+			address = PizzeriaConfiguration.LOCAL_SPACE_URI+":"+portString;
 			space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI+":"+portString);
 		} catch (final URISyntaxException e) {
 			throw new IllegalStateException(
@@ -121,7 +122,14 @@ public class Pizzeria implements NotificationListener {
 		bar = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
 				null,null);
 
+		
+		// delivery queue (telephone)
+		delivery = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
+				null,null);
 
+		
+		//System.out.println(delivery.getId().equals(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY));
+		
 		// TODO: hook the modafacka
 
 		// Create notification
@@ -133,7 +141,7 @@ public class Pizzeria implements NotificationListener {
 		manager.createNotification(entrance, this, Operation.WRITE, null, null);
 		// manager.createNotification(tables, this, Operation.DELETE, null, null);
 		manager.createNotification(bar, this, Operation.WRITE, null, null);
-
+		manager.createNotification(delivery, this, Operation.WRITE,null,null);
 
 
 
@@ -304,8 +312,7 @@ public class Pizzeria implements NotificationListener {
 	
         	tx = capi.createTransaction(timeOut, space);
 
-			// TODO: merge first
-			// a.setOrderstatus(OrderStatus.ORDERED);
+			 a.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
 
 
 			Entry orderEntry = new Entry(a, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(a.getId())), QueryCoordinator.newCoordinationData()));
@@ -318,6 +325,18 @@ public class Pizzeria implements NotificationListener {
 			// AutoRollback
 			return false;
 		}
+	}
+
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 

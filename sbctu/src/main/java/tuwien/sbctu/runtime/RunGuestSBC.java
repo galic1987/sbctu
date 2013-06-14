@@ -136,7 +136,6 @@ public class RunGuestSBC implements NotificationListener {
 	@Override
 	public void entryOperationFinished(Notification arg0, Operation arg1,
 			List<? extends Serializable> arg2) {
-		
         //System.out.println("> Notification: ID" +arg2.toString() + " " + arg1.toString());
 
         if(arg1.equals(Operation.DELETE)){

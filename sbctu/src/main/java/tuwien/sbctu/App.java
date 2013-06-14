@@ -4,6 +4,8 @@ package tuwien.sbctu;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.MzsCoreException;
 
+import tuwien.sbctu.models.Order;
+
 /**
  * Hello world!
  *
@@ -62,10 +64,28 @@ public class App
 			}
 
 
+			int difference = (int) ((int) maxLoad.getLoad()-minLoad.getLoad());
 			// check if there is something to do , number of newDeliveries orders
-			if(maxLoad.getLoad()-minLoad.getLoad() > 1.5){
+			if(difference >= 2){
 				// transfer order and immediately do recalculation
-				minLoad.putDeliveryOrder(maxLoad.takeOneDeliveryOrder());
+				int howManyOrders = difference/2;
+				
+				System.out.println("Balancing "+howManyOrders+ " orders from pizzeria " +maxLoad.getAddress() +" to pizzeria " + minLoad.getAddress() );
+				
+				for (int i = 0; i < howManyOrders; i++) {  
+					Order o = maxLoad.takeOneDeliveryOrder();
+					
+					if(o != null){
+						// try to put order on min load
+						if(minLoad.putDeliveryOrder(o)){
+							// it is ok
+						}else{
+							// custom rollback
+							maxLoad.putDeliveryOrder(o);
+						}
+					}
+				}
+				
 				everythingOK = false;
 			}else{
 				// do the sleeping
