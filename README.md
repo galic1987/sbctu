@@ -74,13 +74,18 @@ mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation1" -Dexec.args="6001 17 x
 Start Simulation2 (200 Pizza total)
 mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation2" -Dexec.args="6002 18 xvsm://localhost:5101"
 ====== RMI =======
-RMI server on localhost port 10879 will be started automatically on RMI-bindingName "pizzeria"
+Start Pizzeria:
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.rmi.RMIPizzeria" -Dexec.args="localhost 10879 pizzeria 100"
 
-1. start "StartRMI.java" arguments: -numberOfTables
-2. start "StartGUI.java" (no arguments)
-3. start "StartWaiter.java" arguments: -waiterID -rmiPort -bindingName (i.e. 1 10879 pizzeria)
-4. start "StartCook.java" arguments: -cookID -rmiPort -bindingName (i.e. 2 10879 pizzeria)
-5. guests can be started from the gui
+Start Waiter:
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.rmi.StartWaiter" -Dexec.args="pizzeria 10879"
+
+Start Cook:
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.rmi.StartCook" -Dexec.args="pizzeria 10879"
+
+Start Driver:
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.rmi.RMIDriver" -Dexec.args="pizzeria 10879"
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.rmi.RMIFiller" -Dexec.args=""
 
 
 
