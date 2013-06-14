@@ -54,16 +54,18 @@ public class RunWaiterSBC implements NotificationListener{
 	protected static Waiter w;
 	protected static AtomicBoolean working;
 	protected static AtomicBoolean checkDelivery;
+	protected static String spaceAddress;
 
 	protected static int timeOut;
 
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		try {
 		int port = Integer.valueOf(args[0]);
 		id = (long)Integer.valueOf(args[1]);
-
+		spaceAddress = args[2];
+		
 		core = DefaultMzsCore.newInstance(port);
 		capi = new Capi(core);
 		w = new Waiter(id);
@@ -74,8 +76,8 @@ public class RunWaiterSBC implements NotificationListener{
 		checkDelivery  = new AtomicBoolean();
 		checkDelivery.set(false);
 
-		try {
-			space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI);
+		
+			space = new URI(spaceAddress);
 
 
 			ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
@@ -121,6 +123,7 @@ public class RunWaiterSBC implements NotificationListener{
 
 		} catch (URISyntaxException | MzsCoreException e) {
 			// TODO Auto-generated catch block
+			System.out.println(">>>usage RunWaiterSBC <myPort> <myId> <addressOfSpace>");
 
 			//capi.rollbackTransaction(tx);
 			e.printStackTrace();

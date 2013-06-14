@@ -36,7 +36,7 @@ import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
 
-public class RunGuestSBC implements NotificationListener {
+public class RunGuestSBC implements NotificationListener,Runnable {
 
 	/**
 	 * @param args[0] - int port unique 
@@ -55,14 +55,22 @@ public class RunGuestSBC implements NotificationListener {
 	
 	protected static AtomicBoolean working;
 	protected static int timeOut;
+	protected static String spaceAddress;
+
+	
+	private  String [] indirectArgs = null;
 	
 	
-	
+
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
+        try {
+
 		int port = Integer.valueOf(args[0]);
 	    id = (long)Integer.valueOf(args[1]);
+		spaceAddress = args[2];
 
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);
@@ -76,8 +84,7 @@ public class RunGuestSBC implements NotificationListener {
          g.setStatus(GroupStatus.WELCOME);
 		    System.out.println(g.getStatus());
 
-        try {
-			space = new URI(PizzeriaConfiguration.LOCAL_SPACE_URI);
+			space = new URI(spaceAddress);
 
 			
 			ArrayList<Coordinator> obligatoryCoords = new ArrayList<Coordinator>();
@@ -255,5 +262,22 @@ public class RunGuestSBC implements NotificationListener {
         	working.set(false);
 		}
 	}
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		main(indirectArgs);
+	}
+	
+	public String[] getIndirectArgs() {
+		return indirectArgs;
+	}
+
+
+	public void setIndirectArgs(String[] indirectArgs) {
+		this.indirectArgs = indirectArgs;
+	}
+
 
 }

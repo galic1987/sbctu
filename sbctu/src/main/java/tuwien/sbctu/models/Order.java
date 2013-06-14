@@ -38,6 +38,10 @@ public class Order implements Serializable{
 	private Long tableID;
 	
 	private ArrayList<Pizza> pizzaList;
+	public void setPizzaList(ArrayList<Pizza> pizzaList) {
+		this.pizzaList = pizzaList;
+	}
+
 	private OrderStatus orderstatus;
 	private Long waiterTableAssigmentId;
 	private Long waiterOrderTookId;
