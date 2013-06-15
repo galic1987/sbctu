@@ -20,25 +20,21 @@ public class GuestGUIImpl implements IGuestGUI{
 
     @Override
     public GuestGroup getGroupInfo() {
-        System.out.println("IMPL: get group");
         return ggQueue.poll();
     }
 
     @Override
     public GuestDelivery getDeliveryInfo() {
-        System.out.println("IMPL: get delivery");
         return gdQueue.poll();
     }
 
     @Override
     public void setGroupInfo(GuestGroup gg) {
-        System.out.println("IMPL: set group");
         ggQueue.add(gg);
     }
 
     @Override
     public void setDeliveryInfo(GuestDelivery gd) {
-        System.out.println("IMPL: set delivery");
         gdQueue.add(gd);
     }
     

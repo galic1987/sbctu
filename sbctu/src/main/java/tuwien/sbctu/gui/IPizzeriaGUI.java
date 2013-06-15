@@ -4,7 +4,8 @@
  */
 package tuwien.sbctu.gui;
 
-import java.util.ArrayList;
+import tuwien.sbctu.models.GuestDelivery;
+import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
 import tuwien.sbctu.models.Table;
 
@@ -14,9 +15,14 @@ import tuwien.sbctu.models.Table;
  */
 public interface IPizzeriaGUI {
     
-    public ArrayList<Table> getTableInfo();
-    public ArrayList<Order> getOrderInfo(); 
+    public Table getTableInfo();
+    public Order getOrderInfo();
+    public void setTableInfo(Table table);
+    public void setOrderInfo(Order order);
     
-    public void setTableInfo(ArrayList<Table> gg);
-    public void setOrderInfo(ArrayList<Order> gd);
+    public GuestGroup getGuestGroupInfo();
+    public GuestDelivery getGuestDeliveryInfo();
+    public void setGuestGroupInfo(GuestGroup gg);
+    public void setGuestGroupDeliveryInfo(GuestDelivery gd);
+    
 }

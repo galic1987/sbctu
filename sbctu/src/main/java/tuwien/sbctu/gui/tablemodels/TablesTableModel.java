@@ -1,9 +1,9 @@
 package tuwien.sbctu.gui.tablemodels;
 
-import tuwien.sbctu.models.GuestGroup;
+import tuwien.sbctu.models.Table;
 
 public class TablesTableModel extends
-		ListBasedTableModel<GuestGroup> {
+		ListBasedTableModel<Table> {
 
 	private static final long serialVersionUID = -8747034718177177762L;
 
@@ -15,15 +15,15 @@ public class TablesTableModel extends
 
 	@Override
 	public Object getValueAt(final int rowIndex, final int columnIndex) {
-		final GuestGroup group = data.get(rowIndex);
+		final Table table = data.get(rowIndex);
 
 		switch (columnIndex) {
 		case 0:
-			return "ID";
+			return table.getId();
 		case 1:
-			return "hello";
+			return table.getTabStat();
 		case 2:
-			return "u";
+			return table.getGroupID();
 		default:
 			return "?";
 		}

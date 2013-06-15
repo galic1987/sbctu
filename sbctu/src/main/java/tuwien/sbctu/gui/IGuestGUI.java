@@ -13,14 +13,14 @@ import tuwien.sbctu.models.GuestGroup;
  */
 public interface IGuestGUI {
     /**
-     * 
-     * implement a queue from where the groupInfo can be taken 
+     *
+     * implement a queue from where the groupInfo can be taken
      */
     public GuestGroup getGroupInfo();
-    public GuestDelivery getDeliveryInfo(); 
+    public GuestDelivery getDeliveryInfo();
     
     /**
-     * 
+     *
      * insert guestinformation to a queue
      */
     public void setGroupInfo(GuestGroup gg);

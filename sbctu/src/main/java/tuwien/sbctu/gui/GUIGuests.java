@@ -18,7 +18,7 @@ import tuwien.sbctu.models.Order;
  * @author Adnan
  */
 public class GUIGuests extends javax.swing.JFrame {
-
+    
     private final String DELIVERY_COUNT_TXT = "Delivery count:";
     private final String DELIVERY_ADDRESS_TXT = "Delivery address:";
     private final String GROUP_COUNT_TXT = "Group count:";
@@ -32,8 +32,9 @@ public class GUIGuests extends javax.swing.JFrame {
     
     ArrayList<GuestGroup> createdGroup;
     ArrayList<GuestDelivery> createdDelivery;
-        
+    
     private IGuestGUI guestTableInformation;
+    
     /**
      * Creates new form GuestGroupGUI
      */
@@ -51,7 +52,7 @@ public class GUIGuests extends javax.swing.JFrame {
         createdGroup = new ArrayList<>();
         createdDelivery = new ArrayList<>();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -209,9 +210,9 @@ public class GUIGuests extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void guestTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_guestTypeItemStateChanged
-       
+        
         if(evt.getStateChange()==1){
             
             if(evt.getItem().equals("Group"))
@@ -219,29 +220,29 @@ public class GUIGuests extends javax.swing.JFrame {
             else if (evt.getItem().equals("Delivery"))
                 delivery = true;
         }
-                
+        
         prepareFields();
         
     }//GEN-LAST:event_guestTypeItemStateChanged
-
-    private void txtSizeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSizeFocusGained
     
+    private void txtSizeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSizeFocusGained
+        
         txtSize.setText("");
     }//GEN-LAST:event_txtSizeFocusGained
-
+    
     private void txtOthersFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtOthersFocusGained
-     
+        
         txtOthers.setText("");
     }//GEN-LAST:event_txtOthersFocusGained
-
+    
     private void txtSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSizeFocusLost
-      
+        
         String getSize = txtSize.getText();
         if(!numbersInField(getSize))
             prepareFields();
         
     }//GEN-LAST:event_txtSizeFocusLost
-
+    
     private void txtOthersFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtOthersFocusLost
         
         String getOthers = txtOthers.getText();
@@ -259,44 +260,44 @@ public class GUIGuests extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_txtOthersFocusLost
-
+    
     private void inProcessBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inProcessBtnActionPerformed
-        // TODO create threads 
+        // TODO create threads
         
         if(!delivery){
-//            tuwien.sbctu.gui.tablemodels.GroupsTableModel gtm = new tuwien.sbctu.gui.tablemodels.GroupsTableModel();
+            //            tuwien.sbctu.gui.tablemodels.GroupsTableModel gtm = new tuwien.sbctu.gui.tablemodels.GroupsTableModel();
             for(int i = 0; i < Integer.valueOf(txtOthers.getText());i++){
                 GuestGroup gg = new GuestGroup(new Long(i+100));
                 gg.setGroupSize(Integer.valueOf(txtSize.getText()));
                 gg.setStatus(GuestGroup.GroupStatus.ENTERED);
                 gg.setOrder(prepareOrder());
-//                gtm.add(gg);  
+                //                gtm.add(gg);
                 guestTableInformation.setGroupInfo(gg);
                 
-
+                
             }
-//        guestTable.setModel(gtm);
-//        guestTable.setRowHeight(guestTable.getRowHeight()*4);
-//        table.setDefaultRenderer(String.class, new MultiLineCellRenderer());
+            //        guestTable.setModel(gtm);
+            //        guestTable.setRowHeight(guestTable.getRowHeight()*4);
+            //        table.setDefaultRenderer(String.class, new MultiLineCellRenderer());
         }
         
         else if(delivery){
-//            tuwien.sbctu.gui.tablemodels.DeliveryTableModel gtm = new tuwien.sbctu.gui.tablemodels.DeliveryTableModel();
+            //            tuwien.sbctu.gui.tablemodels.DeliveryTableModel gtm = new tuwien.sbctu.gui.tablemodels.DeliveryTableModel();
             for(int i = 0; i < Integer.valueOf(txtOthers.getText());i++){
-            GuestDelivery gd = new GuestDelivery(new Long(i+100));
-//                gg.setGroupSize(Integer.valueOf(txtSize.getText()));
+                GuestDelivery gd = new GuestDelivery(new Long(i+100));
+                //                gg.setGroupSize(Integer.valueOf(txtSize.getText()));
                 gd.setStatus(GuestDelivery.DeliveryStatus.DELIVERY);
                 gd.setOrder(prepareOrder());
-//                gtm.add(gd);    
+                //                gtm.add(gd);
                 guestTableInformation.setDeliveryInfo(gd);
             }
-//        deliveryTable.setModel(gtm);
+            //        deliveryTable.setModel(gtm);
         }
         
         prepareFields();
         enablePizzas(4,false);
     }//GEN-LAST:event_inProcessBtnActionPerformed
-
+    
     private boolean numbersInField(String getSize){
         return getSize.matches("[1-4]");
     }
@@ -305,19 +306,19 @@ public class GUIGuests extends javax.swing.JFrame {
         
         if(pizza1.isEnabled()){
             tuwien.sbctu.models.Pizza pizza = new tuwien.sbctu.models.Pizza(pizza1.getSelectedItem().toString(), 0.0,1);
-            or.addPizzaToOrder(pizza);            
+            or.addPizzaToOrder(pizza);
         }
         if(pizza2.isEnabled()){
             tuwien.sbctu.models.Pizza pizza = new tuwien.sbctu.models.Pizza(pizza2.getSelectedItem().toString(), 0.0,1);
-            or.addPizzaToOrder(pizza);            
+            or.addPizzaToOrder(pizza);
         }
         if(pizza3.isEnabled()){
             tuwien.sbctu.models.Pizza pizza = new tuwien.sbctu.models.Pizza(pizza3.getSelectedItem().toString(), 0.0,1);
-            or.addPizzaToOrder(pizza);            
+            or.addPizzaToOrder(pizza);
         }
         if(pizza4.isEnabled()){
             tuwien.sbctu.models.Pizza pizza = new tuwien.sbctu.models.Pizza(pizza4.getSelectedItem().toString(), 0.0,1);
-            or.addPizzaToOrder(pizza);            
+            or.addPizzaToOrder(pizza);
         }
         
         return or;
@@ -334,7 +335,7 @@ public class GUIGuests extends javax.swing.JFrame {
         }
         enablePizzas(4,false);
     }
-
+    
     private void enablePizzas(int pizzaCount, boolean flag){
         for(int i = 0; i < pizzaCount; i++)
             getPizzaCombo(i).setEnabled(flag);
@@ -361,7 +362,7 @@ public class GUIGuests extends javax.swing.JFrame {
                 break;
         }
         return result;
-    }   
+    }
     
     public void setGuestTableInformationInterface(IGuestGUI gti){
         guestTableInformation = gti;
@@ -373,82 +374,82 @@ public class GUIGuests extends javax.swing.JFrame {
     }
     public void updateTables(){
         
-//                System.out.println("started gui: updateTables()");
-//        while(isActive){
-//            
-            GuestGroup ggi = guestTableInformation.getGroupInfo();
-            
-            if(ggi != null)
-                    updateGroup(ggi);  
-            
-//                updateDelivery();
-            
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GUIGuests.class.getName()).log(Level.SEVERE, null, ex);
-            }
-//            
-//        }
+        //                System.out.println("started gui: updateTables()");
+        //        while(isActive){
+        //
+        GuestGroup ggi = guestTableInformation.getGroupInfo();
+        
+        if(ggi != null)
+            updateGroup(ggi);
+        
+        //                updateDelivery();
+        
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIGuests.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //
+        //        }
     }
     
     private void updateGroup(GuestGroup ggi){
         boolean foundGG = false;
-         GroupsTableModel gtm = new GroupsTableModel();
-            
-            if(!guestGroupInfo.isEmpty()){
-                for(GuestGroup gg : guestGroupInfo){                
+        GroupsTableModel gtm = new GroupsTableModel();
+        
+        if(!guestGroupInfo.isEmpty()){
+            for(GuestGroup gg : guestGroupInfo){
                 
                 if(gg.getId().equals(ggi.getId())){
                     gg.setStatus(ggi.getStatus());
                     foundGG = true;
                 }
-                }
             }
-            
-            if (!foundGG)
-                guestGroupInfo.add(ggi);
-            
-            if(!guestGroupInfo.isEmpty()){
+        }
+        
+        if (!foundGG)
+            guestGroupInfo.add(ggi);
+        
+        if(!guestGroupInfo.isEmpty()){
             for(GuestGroup gg : guestGroupInfo)
-             gtm.add(gg);      
+                gtm.add(gg);
             
-            }
-            guestTable.setModel(gtm);
+        }
+        guestTable.setModel(gtm);
     }
     
     private void updateDelivery(){
-    boolean foundGG = false;
-         DeliveryTableModel dtm = new DeliveryTableModel();
-         GuestDelivery gdi = guestTableInformation.getDeliveryInfo();
-         
-         if(!guestDeliveryInfo.isEmpty()){
-             for(GuestDelivery gg : guestDeliveryInfo){
-             
-             if(gg.getId().equals(gdi.getId())){
-                 gg.setCurrentStatus(gdi.getCurrentStatus());
-                 foundGG = true;
-             }
-         }
-         }
-         
-         if (!foundGG)
-             guestDeliveryInfo.add(gdi);
-         
-          if(!guestDeliveryInfo.isEmpty()){
-         for(GuestDelivery gg : guestDeliveryInfo)
-             dtm.add(gg);
-         
-         deliveryTable.setModel(dtm);
-          
-          }
+        boolean foundGG = false;
+        DeliveryTableModel dtm = new DeliveryTableModel();
+        GuestDelivery gdi = guestTableInformation.getDeliveryInfo();
+        
+        if(!guestDeliveryInfo.isEmpty()){
+            for(GuestDelivery gg : guestDeliveryInfo){
+                
+                if(gg.getId().equals(gdi.getId())){
+                    gg.setCurrentStatus(gdi.getCurrentStatus());
+                    foundGG = true;
+                }
+            }
+        }
+        
+        if (!foundGG)
+            guestDeliveryInfo.add(gdi);
+        
+        if(!guestDeliveryInfo.isEmpty()){
+            for(GuestDelivery gg : guestDeliveryInfo)
+                dtm.add(gg);
+            
+            deliveryTable.setModel(dtm);
+            
+        }
     }
     
     private class Updater extends Thread {
         @Override
         public void run() {
             while (isActive){
-            updateTables();
+                updateTables();
             }
         }
     }
@@ -459,7 +460,7 @@ public class GUIGuests extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -478,7 +479,7 @@ public class GUIGuests extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GUIGuests.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
