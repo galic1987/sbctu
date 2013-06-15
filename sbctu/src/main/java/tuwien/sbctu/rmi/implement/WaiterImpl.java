@@ -2,56 +2,56 @@ package tuwien.sbctu.rmi.implement;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import tuwien.sbctu.rmi.interfaces.IWaiterRMI;
+import tuwien.sbctu.models.Waiter;
+import tuwien.sbctu.models.Waiter.WaiterStatus;
+import tuwien.sbctu.rmi.interfaces.IWaiter;
 
-public class WaiterImpl extends UnicastRemoteObject  implements IWaiterRMI{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	private Long id;
-	private int ws;
-	
-	public WaiterImpl(Long id) throws RemoteException {
-		super();
-		
-		this.id = id;
-		ws = 0;
-	}
-	
-	@Override
-	public Long getId(){
-		return id;
-	}
-
-	@Override
-	public void notification(String message) throws RemoteException {
-		System.out.println(message);
-		if(ws == 0)
-			processNotification(message);		
-	}
-	
-	public synchronized void setStatus(int ws) throws RemoteException {
-		this.ws = ws;
-	}
-
-	public synchronized int getStatus() throws RemoteException {
-		return ws;
-	}
-	
-	public void processNotification(String message){
-		if(message.contains("Entry"))// && ws.equals(WaiterStatus.WAITING))
-			ws = 1;		//WaiterStatus.WORKING;
-		else if(message.contains("Done"))
-			ws = 0;	//WaiterStatus.WAITING;
-		else if(message.contains("Order") && message.contains("waiting"))
-			ws = 2;
-		else if(message.contains("Order") && message.contains("ready"))
-			ws = 3;
-		else if(message.contains("Bill"))
-			ws = 4;
-	}
+@SuppressWarnings("serial")
+public class WaiterImpl extends UnicastRemoteObject implements IWaiter{
+    
+    Waiter waiter;
+    Queue<WaiterStatus> todos = new ConcurrentLinkedQueue<>();
+    Queue<WaiterStatus> calls = new ConcurrentLinkedQueue<>();
+    
+    public WaiterImpl(Waiter waiter) throws RemoteException{
+        this.waiter = waiter;
+    }
+    
+    @Override
+    public synchronized void notification(String message) throws RemoteException {
+        System.out.println(message);
+        
+        if(message.contains("!waitingGuests"))
+            todos.add(WaiterStatus.SITDOWN);
+        else if(message.contains("!phoneCall"))
+            calls.add(WaiterStatus.CALL);
+        else if(message.contains("!orderWaiting"))
+            todos.add(WaiterStatus.GETORDER);
+        else if(message.contains("!cookedOrder"))
+            todos.add(WaiterStatus.SERVING);
+        
+    }
+    
+    @Override
+    public void setStatus(WaiterStatus waiterStatus) throws RemoteException {
+        waiter.setWaiterStatus(waiterStatus);
+    }
+    
+    @Override
+    public Waiter getWaiter() throws RemoteException {
+        return waiter;
+    }
+    
+    @Override
+    public synchronized WaiterStatus lookupTodo() throws RemoteException {
+        return todos.poll();
+    }
+    
+    @Override
+    public WaiterStatus lookupCalls() throws RemoteException {
+        return calls.poll();
+    }
 }

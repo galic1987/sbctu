@@ -55,6 +55,7 @@ public class GuestDelivery extends Person {
 
     public enum DeliveryStatus {
 
-        DELIVERY, PROCESSED, PAYED, TRANSFERRED;
+        DELIVERY, PROCESSED, PAYED, TRANSFERRED, 
+        ORDERED, DELIVERED, WELCOME;
     }
 }

@@ -1,48 +1,70 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package tuwien.sbctu.rmi.implement;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import tuwien.sbctu.models.Cook;
+import tuwien.sbctu.rmi.interfaces.ICook;
 
-import tuwien.sbctu.models.Cook.CookStatus;
-import tuwien.sbctu.rmi.interfaces.ICookRMI;
+/**
+ *
+ * @author Adnan
+ */
+public class CookImpl extends UnicastRemoteObject implements ICook{
+    
+    Cook cook ;
+    int status = 0;
+    
+    Queue<String> groups = new ConcurrentLinkedQueue<>();
+    Queue<String> deliveries = new ConcurrentLinkedQueue<>();
+    
+    public CookImpl(Cook cook) throws RemoteException{
+        this.cook = cook;
+    }
+    
+    @Override
+    public void notification(String message) throws RemoteException {
+//        System.out.println(message);
+        if(status == 0){
+            if(message.contains("!inHouse"))
+                status = 1;
+            else if(message.contains("!delivery"))
+                status = 2;
+        }
+        else
+            if(message.contains("!inHouse"))
+                groups.add(message);
+            else if(message.contains("!delivery"))
+                deliveries.add(message);
+    }
+    
+    @Override
+    public void setStatus(int status) throws RemoteException {
+        this.status = status;
+    }
+    
+    @Override
+    public Cook getCook() throws RemoteException {
+        return cook;
+    }
 
-public class CookImpl extends UnicastRemoteObject implements ICookRMI{
+    @Override
+    public int getStatus() throws RemoteException {
+        return status;
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private Long id;
-	private CookStatus ws;
-	public CookImpl(Long id) throws RemoteException{
-		this.id = id;
-		ws = CookStatus.WAITING;
-	}
-	@Override
-	public void notification(String message) throws RemoteException {
-		System.out.println(message);
-		if(ws.equals(CookStatus.WAITING))
-			processNotification(message);	
-	}
+    @Override
+    public String getGroupOrder() throws RemoteException {
+       return groups.poll();
+    }
 
-	@Override
-	public void setStatus(CookStatus cs) throws RemoteException {
-		ws = cs;		
-	}
-
-	@Override
-	public CookStatus getStatus() throws RemoteException {
-		return ws;
-	}
-
-	@Override
-	public Long getId() throws RemoteException {
-		return id;
-	}
-
-	public void processNotification(String message){
-		if(message.contains("Todo"))
-			ws = CookStatus.WORKING;
-	}
+    @Override
+    public String getDeliveryOrder() throws RemoteException {
+        return deliveries.poll();
+    }    
 }

@@ -81,7 +81,8 @@ public class Waiter extends Person{
 	}
 	
 	public enum WaiterStatus {
-		WELCOME, WAITING, WORKING
+		WELCOME, WAITING, WORKING,
+                BILLING, CALL, SERVING, SITDOWN, GETORDER;
 	}
 
 }
