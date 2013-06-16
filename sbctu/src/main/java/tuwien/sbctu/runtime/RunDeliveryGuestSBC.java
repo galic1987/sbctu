@@ -79,7 +79,7 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 		spaceAddress = spaceAddressa;
 		pizz = pizza;
 		
-		deliveryAddress = new DeliveryAddress(spaceAddress, nextSessionId());
+		deliveryAddress = new DeliveryAddress(spaceAddress, String.valueOf(ida));
 		
 		 core = DefaultMzsCore.newInstance(port);
          capi = new Capi(core);

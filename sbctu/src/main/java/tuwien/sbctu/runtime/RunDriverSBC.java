@@ -64,7 +64,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 			 core = DefaultMzsCore.newInstance(port);
 	         capi = new Capi(core);
 	         
-	         timeOut = 15000;
+	         timeOut = 5000;
 	         
 	         working = new AtomicBoolean();
 	         working.set(false);

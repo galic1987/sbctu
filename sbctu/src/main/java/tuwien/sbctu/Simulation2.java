@@ -69,7 +69,7 @@ public class Simulation2 {
 
 			for (int i = 14200; i < 14301; i++){
 				//Order o = new Order(id+i);
-				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p1);
+				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(i, i, spaceAddress, p1);
 
 				//  System.out.println(id+i);
 				//	        Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));
@@ -90,7 +90,7 @@ public class Simulation2 {
 
 			for (int i = 15400; i < 15501; i++){
 				//Order o = new Order(id+i);
-				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p);
+				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(i,  i, spaceAddress, p);
 
 				//  System.out.println(id+i);
 				//        Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));

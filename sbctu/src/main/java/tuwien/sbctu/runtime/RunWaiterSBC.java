@@ -99,29 +99,29 @@ public class RunWaiterSBC implements NotificationListener{
 
 			for (;;) {
 				try {
-				//System.out.println("-----> Starting all over again");
+				//System.out.println("-----> Starting all over again" + spaceAddress);
 
-					if (working.get()) continue;
+				//	if (working.get()) continue;
 
 				if(checkTheDeliveryOrders()) continue;
 				
 				
 				// 1. entrance check -> check entrance, and bring the guestgroups to table -> make table
 				entranceTake();
-				if (working.get()) continue;
+				//if (working.get()) continue;
 
 				// 2. tables -> if order ORDERED -> put it on the theke -> status ORDERONBAR
 				ordersTake();
-				if (working.get()) continue;
+				//if (working.get()) continue;
 
 				// 3. if order FINISHED , take it from theke and take the table and write table
 				putThemToEat();
-				if (working.get()) continue;
+				//if (working.get()) continue;
 
 				
 				// 4. if there BILL request read it -> log it and delete it		
 				doTheBilling();
-				if (working.get()) continue;
+				//if (working.get()) continue;
 
 				// 5. take the deliveries to bar
 
@@ -302,7 +302,7 @@ public class RunWaiterSBC implements NotificationListener{
 			tx = capi.createTransaction(timeOut, space);
 			ArrayList<Order> entries = new ArrayList<Order>();
 
-			entries = capi.take(delivery, Arrays.asList(AnyCoordinator.newSelector(Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+			entries = capi.take(delivery, Arrays.asList(AnyCoordinator.newSelector(1)) , RequestTimeout.TRY_ONCE, tx);
 			System.out.println(entries.size());
 			
 			for (Order o : entries){
@@ -320,7 +320,7 @@ public class RunWaiterSBC implements NotificationListener{
 			return true;
 		} catch ( Exception e) {
 			// AutoRollback
-			e.printStackTrace();
+			//e.printStackTrace();
 
 			return false;
 			//printExp(e);

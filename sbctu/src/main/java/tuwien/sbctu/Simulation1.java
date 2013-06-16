@@ -46,7 +46,7 @@ public class Simulation1 {
 		
 		core = DefaultMzsCore.newInstance(port);
 		capi = new Capi(core);
-		timeOut = 14000;
+		timeOut = 4000;
 		
 		
 		//put order on delivery 
@@ -56,7 +56,7 @@ public class Simulation1 {
 	     
         
 
-		delivery = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, 1000, null);
+		delivery = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, 112000, null);
 
 
 		ArrayList<Pizza> p = new ArrayList<Pizza>();
@@ -67,9 +67,9 @@ public class Simulation1 {
         
         System.out.println(id);
 
-		for (int i = 18000; i < 18101; i++){
+		for (int i = 16000; i < 16101; i++){
 		//Order o = new Order(id+i);
-        RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p);
+        RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(i, i, spaceAddress, p);
         
       //  System.out.println(id+i);
 //        Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));

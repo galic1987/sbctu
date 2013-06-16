@@ -23,12 +23,11 @@ public class SimulationComplete {
 		
 		System.out.println("start cook");
 		String[] cook = new String[4];
-		cook[0] = "11161 89 xvsm://localhost:5100";
+		cook[0] = "11161 89 xvsm://localhost:5102";
 		cook[1] = "11162 88 xvsm://localhost:5101";
-		cook[2] = "11163 87 xvsm://localhost:5100";
+		cook[2] = "11163 87 xvsm://localhost:5102";
 		cook[3] = "11164 86 xvsm://localhost:5101";
-		
-		for(int i = 0; i<cook.length;i++){
+ 		for(int i = 0; i<cook.length;i++){
 			Thread t = new Thread(new RunCookThread(cook[i].split(" ")));
 			t.start();
 		}
@@ -39,12 +38,13 @@ public class SimulationComplete {
 		System.out.println("start delivery");
 
 		String[] del = new String[4];
-		del[0] = "8171 79 xvsm://localhost:5100";
-		del[1] = "8172 78 xvsm://localhost:5101";
-		del[2] = "8173 77 xvsm://localhost:5100";
-		del[3] = "8174 76 xvsm://localhost:5101";
-		
+		del[0] = "8171 79 xvsm://localhost:5102";
+		del[1] = "8172 78 xvsm://localhost:5102";
+		del[2] = "8173 77 xvsm://localhost:5102";
+		del[3] = "8174 76 xvsm://localhost:5102";
+		 
 		for(int i = 0; i<del.length;i++){
+			
 			Thread t = new Thread(new RunDriverThread(del[i].split(" ")));
 			t.start();
 		}
@@ -52,10 +52,10 @@ public class SimulationComplete {
 		System.out.println("start waiter");
 
 		String [] wait = new String[4];
-		wait[0] = "9151 99 xvsm://localhost:5100";
+		wait[0] = "9151 99 xvsm://localhost:5101";
 		wait[1] = "9152 98 xvsm://localhost:5101";
-		wait[2] = "9153 97 xvsm://localhost:5100";
-		wait[3] = "9154 96 xvsm://localhost:5101";
+		wait[2] = "9153 97 xvsm://localhost:5102";
+		wait[3] = "9154 96 xvsm://localhost:5102";
 
 		for(int i = 0; i<wait.length;i++){
 			Thread t = new Thread(new RunWaiterThread(wait[i].split(" ")));
@@ -67,38 +67,7 @@ public class SimulationComplete {
 	}
 	
 	
-	public static class RunCookThread implements Runnable {
-		public String [] argss;
-		public RunCookThread(String [] arg){
-			argss = arg;
-		}
-		
-	    public void run() {
-			  RunCookSBC.main(argss);	
-	    }
-	}
-	
-	public static class RunWaiterThread implements Runnable {
-		public String [] argss;
-		public RunWaiterThread(String [] arg){
-			argss = arg;
-		}
-	    public void run() {
-				  RunWaiterSBC.main(argss);	
-	    }
-	}
-	
-	
-	public static class RunDriverThread implements Runnable {
-		public String [] argss;
-		public RunDriverThread(String [] arg){
-			argss = arg;
-		}
-	    public void run() {
-				  RunDriverSBC.main(argss);	
-	    }
-	}
-	
+
 	
 
 }

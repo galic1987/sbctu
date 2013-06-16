@@ -248,6 +248,50 @@ public class Pizzeria implements NotificationListener {
 	}
 
 
+	public int openDeliveries(){
+		// saves the load inside
+		int i = 0;
+				TransactionReference tx;
+				try {
+					tx = capi.createTransaction(timeOut , space);
+					ArrayList<Order> orders = new ArrayList<Order>();
+					Query qo = new Query().sql("status = 'DELIVERYNEW'");
+					i =  capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+					capi.commitTransaction(tx);
+					return i;
+				} catch ( Exception e) {
+					// AutoRollback
+					//load = 0;
+					//e.printStackTrace();
+				}finally{
+					//working.set(false);
+				}
+return 0;
+
+	}
+	
+	public int finishedDeliveries(){
+		// saves the load inside
+		int i = 0;
+				TransactionReference tx;
+				try {
+					tx = capi.createTransaction(timeOut , space);
+					ArrayList<Order> orders = new ArrayList<Order>();
+					Query qo = new Query().sql("status = 'DELIVERYCOOKED'");
+					i =  capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+					capi.commitTransaction(tx);
+					return i;
+				} catch ( Exception e) {
+					// AutoRollback
+					//load = 0;
+					//e.printStackTrace();
+				}finally{
+					//working.set(false);
+				}
+return 0;
+
+	}
+	
 	
 	public int goodDeliveries(){
 		// saves the load inside

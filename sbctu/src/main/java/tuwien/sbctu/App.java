@@ -146,6 +146,8 @@ active = false;
 	public static void updategui(){
 		int deliveryGood = 0;
 		int deliveryFailed = 0;
+		int deliveryCooked = 0;
+		int deliveryOpen = 0;
 
 		for (int i = 0; i < p.length; i++) { 
 			Pizzeria pizz = p[i];
@@ -153,8 +155,11 @@ active = false;
 			try {	
 				
 			
-deliveryGood += pizz.goodDeliveries();
-deliveryFailed += pizz.failDeliveries();
+				deliveryGood += pizz.goodDeliveries();
+				deliveryFailed += pizz.failDeliveries();
+				
+				deliveryCooked += pizz.finishedDeliveries();
+				deliveryOpen += pizz.openDeliveries();
 				
 				//System.out.println(pizz.getArchive().size());
 //			for(Order o :pizz.getArchive() ) guiInterface.setArchiveInfo(o);
@@ -177,6 +182,8 @@ deliveryFailed += pizz.failDeliveries();
 		
 		System.out.println("Good deliveries " + deliveryGood);
 		System.out.println("Bad deliveries " + deliveryFailed);
+		System.out.println("Cooked deliveries " + deliveryCooked);
+		System.out.println("Open deliveries " + deliveryOpen);
 		
 	}
 
