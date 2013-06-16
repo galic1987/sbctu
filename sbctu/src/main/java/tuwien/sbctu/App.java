@@ -5,6 +5,8 @@ import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.MzsCoreException;
 
 import tuwien.sbctu.gui.GUIPizzeria;
+import tuwien.sbctu.gui.IPizzeriaGUI;
+import tuwien.sbctu.gui.PizzeriaGUIImpl;
 import tuwien.sbctu.models.Order;
 
 /**
@@ -13,13 +15,20 @@ import tuwien.sbctu.models.Order;
  */
 public class App 
 {
+
+
+
+	private static IPizzeriaGUI guiInterface = null;
 	private static Pizzeria[] p;
-	private static final GUIPizzeria pizz = new GUIPizzeria();
+	
+	private static int transferedNr = 0;
 
 	public static void main( String[] args )
 	{
 		//System.out.println( "Hello World!" + args );
-		
+
+
+
 		p = new Pizzeria[args.length];
 		for (int i = 0; i < args.length; i++) { 
 			try {
@@ -32,26 +41,24 @@ public class App
 			}
 		}
 
-		
+
+
+		guiInterface = new PizzeriaGUIImpl();
+
+		GUIPizzeria  gui = new GUIPizzeria();
+		gui.setPizzeriaInformationInterface(guiInterface);
+		gui.setVisible(true);
+
+
 		// more than 1 pizzeria, start loadbalancing
 		if(args.length>1){
 			algo();
 		}
-		
-		
-		try {
-			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception ex) {
-		
-		}
-		pizz.setVisible(true);
+
+
+
 		//  pizz.subscribeToSBC();
-		 // pizz.updateFields();
+		// pizz.updateFields();
 
 
 	}
@@ -83,34 +90,36 @@ public class App
 
 			}
 
-			
+
 
 			int difference = (int) ((int) maxLoad.getLoad()-minLoad.getLoad());
-			
+
 			System.out.println("Loadbalancer calculating! maxmin " + maxLoad.getLoad() + " >= " + minLoad.getLoad());
 
-			
+
 			// check if there is something to do , number of newDeliveries orders
 			if(difference >= 2){
 				// transfer order and immediately do recalculation
 				int howManyOrders = difference/2;
-				
+
 				System.out.println("Balancing "+howManyOrders+ " orders from pizzeria " +maxLoad.getAddress() +" to pizzeria " + minLoad.getAddress() );
-				
+
 				for (int i = 0; i < howManyOrders; i++) {  
 					Order o = maxLoad.takeOneDeliveryOrder();
-					
+
 					if(o != null){
 						// try to put order on min load
 						if(minLoad.putDeliveryOrder(o)){
 							// it is ok
+							transferedNr +=  1;
+
 						}else{
 							// custom rollback
 							maxLoad.putDeliveryOrder(o);
 						}
 					}
 				}
-				
+
 				everythingOK = false;
 			}else{
 				// do the sleeping
@@ -119,13 +128,26 @@ public class App
 
 
 
-			try {
+			try {	
 
 				if(everythingOK) Thread.sleep(3000);
+				updategui();
+				System.out.println("Transfered # " + transferedNr);
+
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
+		}
+	}
+
+
+	public static void updategui(){
+		for (int i = 0; i < p.length; i++) { 
+			Pizzeria pizz = p[i];
+			
+			
 		}
 	}
 

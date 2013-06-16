@@ -200,8 +200,10 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				o.setDriverId(id);
 				
 				// on new space
+				// Bechmark disable
+				//Thread.sleep(3000); // lasts for
 				
-				Thread.sleep(3000); // lasts for
+				
 				URI newspace = new URI(o.getDeliveryAddress().getSpaceAddress());
 				ContainerReference deliveryAddress = capi.lookupContainer(o.getDeliveryAddress().getContainerName(), newspace, 1000, null);
 				

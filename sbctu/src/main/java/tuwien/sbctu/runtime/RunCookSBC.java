@@ -133,7 +133,11 @@ public class RunCookSBC implements NotificationListener {
 			Order o = orders.get(0);
 			System.out.println(o.toString());
 			//            for (Pizza p : o.getPizzaList()) {
+			
+			
 			c.cookPizzasFromOrder(o);
+			
+			
 			//Thread.sleep(p.getPrepareTime());
 			//			}
 			o.setOrderstatus(OrderStatus.COOKED);
@@ -175,7 +179,7 @@ public class RunCookSBC implements NotificationListener {
 
 			System.out.println(o.toString());
 			//            for (Pizza p : o.getPizzaList()) {
-			c.cookPizzasFromOrder(o);
+			//c.cookPizzasFromOrder(o);
 			//Thread.sleep(p.getPrepareTime());
 			//			}
 			o.setOrderstatus(OrderStatus.DELIVERYCOOKED);

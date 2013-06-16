@@ -248,6 +248,47 @@ public class Pizzeria implements NotificationListener {
 	}
 
 
+	
+	public ArrayList<Order> getArchive(){
+		// saves the load inside
+				TransactionReference tx;
+				try {
+					//working.set(true);
+					tx = capi.createTransaction(timeOut , space);
+					ArrayList<Order> orders = new ArrayList<Order>();
+					// ArrayList<Table> tablesArr = new ArrayList<Table>();
+
+					// query coordinator
+					//Query qo1 = new Query().cnt(Query.ALL).sql("");
+
+					
+					
+					//System.out.println(capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo1,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx));
+
+					orders = capi.read(archive, Arrays.asList(AnyCoordinator.newSelector(Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+					
+
+					//Order o = orders.get(0);
+					
+					//System.out.println(capi.read(bar, Arrays.asList(QueryCoordinator.newSelector(qo))  , RequestTimeout.DEFAULT, tx).size());
+
+
+					capi.commitTransaction(tx);
+					
+					return orders;
+
+
+				} catch ( Exception e) {
+					// AutoRollback
+					//load = 0;
+					//e.printStackTrace();
+				}finally{
+					//working.set(false);
+				}
+
+
+				return null;
+	}
 
 
 	public double calculatePizzeriaLoad(){
