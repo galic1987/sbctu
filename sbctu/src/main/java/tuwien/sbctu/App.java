@@ -4,6 +4,7 @@ package tuwien.sbctu;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.MzsCoreException;
 
+import tuwien.sbctu.gui.GUIPizzeria;
 import tuwien.sbctu.models.Order;
 
 /**
@@ -13,6 +14,7 @@ import tuwien.sbctu.models.Order;
 public class App 
 {
 	private static Pizzeria[] p;
+	private static final GUIPizzeria pizz = new GUIPizzeria();
 
 	public static void main( String[] args )
 	{
@@ -35,6 +37,21 @@ public class App
 		if(args.length>1){
 			algo();
 		}
+		
+		
+		try {
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception ex) {
+		
+		}
+		pizz.setVisible(true);
+		//  pizz.subscribeToSBC();
+		 // pizz.updateFields();
 
 
 	}
