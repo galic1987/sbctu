@@ -61,5 +61,17 @@ public class PizzeriaGUIImpl implements IPizzeriaGUI{
     public void setGuestGroupDeliveryInfo(GuestDelivery gd) {
         guestDeliveryQueue.add(gd);
     }
+    
+    Queue<Order> archiveQueue = new ConcurrentLinkedQueue<>();
+
+    @Override
+    public void setArchiveInfo(Order order) {
+        archiveQueue.add(order);
+    }
+
+    @Override
+    public Order getArchiveInfo() {
+        return archiveQueue.poll();
+    }
 
 }
