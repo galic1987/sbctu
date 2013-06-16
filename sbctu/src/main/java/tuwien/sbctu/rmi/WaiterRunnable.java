@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import tuwien.sbctu.models.GuestDelivery;
 import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Order.OrderStatus;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.Waiter;
 import tuwien.sbctu.models.Waiter.WaiterStatus;
@@ -21,13 +22,14 @@ public class WaiterRunnable implements Runnable{
     private static final Logger log = Logger.getLogger("RunnableWaiter");
     
     private boolean isActive;
+    private boolean callDoneBefore;
     
     private IPizzeria iPizzeria;
     private IWaiter interfaceWaiter;
     
     public WaiterRunnable(Waiter waiter, Integer port, String bindingName){
         isActive = true;
-        
+        callDoneBefore = false;
         try {
             this.interfaceWaiter = new WaiterImpl(waiter);
         } catch (RemoteException e) {
@@ -87,17 +89,25 @@ public class WaiterRunnable implements Runnable{
         WaiterStatus call = interfaceWaiter.lookupCalls();
         
         //if calls are found then answer else do some other work
-        if(call != null)
+        if(call != null && !callDoneBefore){
             todo = call;
-        else
+            callDoneBefore = true;
+        }
+        else{
             todo = interfaceWaiter.lookupTodo();
+            callDoneBefore = false;
+        }
         
-        if(todo == null)
-            return;
+        if(todo == null){
+           
+            callDoneBefore = false;
+             return;
+        }
         
         switch(todo){
             
             case BILLING:
+                bringBill();
                 break;
             case CALL:
                 answerCall();
@@ -124,7 +134,7 @@ public class WaiterRunnable implements Runnable{
     
     //try to find a place for waiting group
     private void sitDownGroup() throws RemoteException{
-        interfaceWaiter.getWaiter().setWaiterStatus(WaiterStatus.WORKING);
+        working();
         GuestGroup gg = null;
         
         //find free table
@@ -143,13 +153,15 @@ public class WaiterRunnable implements Runnable{
                 iPizzeria.returnFreeTable(freeTable);
             }
         }
+        else
+            interfaceWaiter.notification("!waitingGuests");
         
         
-        interfaceWaiter.getWaiter().setWaiterStatus(WaiterStatus.WAITING);
+        waiting();
     }
     
     private void answerCall() throws RemoteException{
-        interfaceWaiter.getWaiter().setWaiterStatus(WaiterStatus.WORKING);
+        working();
         GuestDelivery gd = null;
         
         gd = iPizzeria.answerCall();
@@ -166,10 +178,12 @@ public class WaiterRunnable implements Runnable{
             iPizzeria.placeDeliveryOrder(gd.getOrder());
             iPizzeria.notifyDelivery(gd.getId(), "!ordered");
         }
-        interfaceWaiter.getWaiter().setWaiterStatus(WaiterStatus.WAITING);
+        waiting();
     }
     
     private void getOrder() throws RemoteException{
+        working();
+        
         Order or = iPizzeria.getNewOrder();
         
         if(or!= null){
@@ -181,11 +195,41 @@ public class WaiterRunnable implements Runnable{
         else
             System.out.println("No new order waiting.");
         
-        interfaceWaiter.getWaiter().setWaiterStatus(WaiterStatus.WAITING);
+        waiting();
     }
     
     private void serveOrder() throws RemoteException{
+        working();
+        
+        Order o = iPizzeria.getCookedOrder();
+        if(o!= null){
+            o.setOrderstatus(OrderStatus.SERVING);
+            o.setWaiterServedId(interfaceWaiter.getWaiter().getId());
+            
+            iPizzeria.serveOrder(o);
+        }
+        else
+            System.out.println("No cooked order waiting.");
+        
+        waiting();
+    }
     
+    private void bringBill()throws RemoteException{
+        working();
+        
+        Table table = iPizzeria.prepareBill();
+        if(table != null){
+            table.getOrder().setWaiterBillProcessedId(interfaceWaiter.getWaiter().getId());
+            iPizzeria.sendBill(table);
+        }
+        
+        waiting();
+    }
+    private void waiting() throws RemoteException{
+        interfaceWaiter.setStatus(WaiterStatus.WAITING);
+    }
+    private void working() throws RemoteException{
+        interfaceWaiter.setStatus(WaiterStatus.WORKING);
     }
     
 }

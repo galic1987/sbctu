@@ -76,10 +76,9 @@ public class GuestDeliveryRunnable implements Runnable{
         DeliveryStatus gs = iGuestDelivery.getGroup().getStatus();
         
         switch(gs){
-            
+            case CALLED:
+                break;
             case ORDERED:
-//                System.out.println("ORDERED");
-//                iGuestDelivery.getGroup().setStatus(GuestDeliveryStatus.DELIVERED);
                 break;
             case DELIVERED:
                 System.out.println("Delivered");

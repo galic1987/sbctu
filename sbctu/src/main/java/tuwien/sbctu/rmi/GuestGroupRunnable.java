@@ -97,16 +97,15 @@ public class GuestGroupRunnable implements Runnable{
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                //			igg.setStatus(GroupStatus.FINISHED);
-                
-                //			pizzeriaRMI.requestBill(guestGroup.getId());
-                log.info("Finished eating");
+                GuestGroup gg = iGuestGroup.getGroup();
+                iPizzeria.requestBill(gg);
+                iGuestGroup.setStatus(GroupStatus.FINISHED);
                 break;
             case FINISHED:
                 break;
             case BILL:
                 System.out.println("Thanks for the delicious meal.");
-                //			pizzeriaRMI.payBillNLeave(guestGroup.getId());
+                iPizzeria.payBillNLeave(iGuestGroup.getGroup().getId());
                 isActive = false;
                 break;
                 

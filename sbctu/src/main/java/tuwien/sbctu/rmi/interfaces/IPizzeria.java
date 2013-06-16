@@ -10,13 +10,12 @@ import tuwien.sbctu.models.Driver;
 import tuwien.sbctu.models.GuestDelivery;
 import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
-import tuwien.sbctu.models.Order.OrderStatus;
 import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.Waiter;
 
 public interface IPizzeria extends Remote{
-    
+       
     public void entryPizzeria(GuestGroup guestGroup, IGuestGroup guestGroupInterface) throws RemoteException;
     public void callPizzeria(GuestDelivery guestDelivery, IGuestDelivery guestDeliveryInterface) throws RemoteException;
     public void beginWork(Waiter waiter, IWaiter interfaceWaiter) throws RemoteException;
@@ -34,7 +33,7 @@ public interface IPizzeria extends Remote{
     public void placeDeliveryOrder(Order order) throws RemoteException;
     public void placeGroupOrder(Order order) throws RemoteException;
     public Order getNewOrder() throws RemoteException;
-    public Order getCookedOrder(OrderStatus status) throws RemoteException;
+    public Order getCookedOrder() throws RemoteException;
     public void notifyGroup(Long id, String msg) throws RemoteException;
     public void notifyDelivery(Long id, String msg) throws RemoteException;
     
@@ -56,5 +55,12 @@ public interface IPizzeria extends Remote{
     
     public void benchmarkOrders(ArrayList<Order> orderList, Queue<Pizza> pizzas) throws RemoteException;
     public void benchmarkStart() throws RemoteException;
+    public void registerGuestGUI(IGuestGUIRMI guiInterface) throws RemoteException;
+    public void registerPizzeriaGUI(IPizzeriaGUIRMI guiInterface) throws RemoteException;
+    
+    public void requestBill(GuestGroup guestGroup) throws RemoteException;
+    public Table prepareBill() throws RemoteException;
+    public void sendBill(Table table) throws RemoteException;
+    public void payBillNLeave(Long groupID) throws RemoteException;
     
 }

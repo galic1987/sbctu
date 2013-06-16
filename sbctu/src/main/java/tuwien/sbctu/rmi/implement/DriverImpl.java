@@ -55,13 +55,16 @@ public class DriverImpl extends UnicastRemoteObject implements IDriver{
     @Override
     public String toDeliver() throws RemoteException {
         String result = deliveries.poll();
-        
-        if(driver.getDriverStatus().equals(DriverStatus.WAITING)){
+        if(result != null){
+            
+            if(driver.getDriverStatus().equals(DriverStatus.WAITING)){
             if(result.contains("!delivery"))
                 driver.setDriverStatus(DriverStatus.DRIVING);
         }
         else
             deliveries.add(result);
+        }
+        
         
         return result;
     }

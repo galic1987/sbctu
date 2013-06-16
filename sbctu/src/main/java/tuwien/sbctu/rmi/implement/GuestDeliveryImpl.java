@@ -46,7 +46,7 @@ public class GuestDeliveryImpl extends UnicastRemoteObject implements IGuestDeli
 	
 	public void processNotification(String message){
 		if(message.contains("!hello"))
-			guestGroup.setStatus(DeliveryStatus.WELCOME);
+			guestGroup.setStatus(DeliveryStatus.CALLED);
 		if(message.contains("!ordered"))
 			guestGroup.setStatus(DeliveryStatus.ORDERED);
 		else if(message.contains("!dingdong"))
@@ -54,5 +54,4 @@ public class GuestDeliveryImpl extends UnicastRemoteObject implements IGuestDeli
 		else if (message.contains("!bill"))
 			guestGroup.setStatus(DeliveryStatus.PAYED);
 	}
-
 }

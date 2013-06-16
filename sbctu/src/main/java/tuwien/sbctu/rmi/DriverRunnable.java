@@ -100,10 +100,9 @@ public class DriverRunnable implements Runnable{
         Order o = iPizzeria.getDeliveryOrder();
         
         if(o != null){
-            System.out.println("Driving.");
+            System.out.println("Driving for deliveryOrder:"+o.getId());
             Thread.sleep(3000);
-            System.out.println("");
-            System.out.println("Finished: sent delivery.");
+            System.out.println("Finished sending deliveryOrder:"+o.getId());
             iPizzeria.deliverOrder(o);
         }
         interfaceDriver.setStatus(DriverStatus.WAITING);

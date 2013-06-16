@@ -22,26 +22,26 @@ public class TestGuest {
         
         guiGuests.activateThread();
         
-        GuestGroup tgg = new GuestGroup(new Long(100));
-        tgg.setStatus(GroupStatus.EATING);
-        guiInterface.setGroupInfo(tgg);
-        System.out.println("gg 100: update status to eating");
-        
-        Thread.sleep(6000);
-        
-        tgg.setStatus(GroupStatus.FINISHED);
-        guiInterface.setGroupInfo(tgg);
-        System.out.println("gg 100: update status to finished");
-        
-        Thread.sleep(3000);
-        
-        GuestGroup tgg2 = new GuestGroup(new Long(101));
-        
-        guiInterface.setGroupInfo(tgg2);
-        
-        Thread.sleep(50000);
-        tgg2.setStatus(GroupStatus.SITTING);
-        guiInterface.setGroupInfo(tgg2);
+//        GuestGroup tgg = new GuestGroup(new Long(100));
+//        tgg.setStatus(GroupStatus.EATING);
+//        guiInterface.setGroupInfo(tgg);
+//        System.out.println("gg 100: update status to eating");
+//        
+//        Thread.sleep(6000);
+//        
+//        tgg.setStatus(GroupStatus.FINISHED);
+//        guiInterface.setGroupInfo(tgg);
+//        System.out.println("gg 100: update status to finished");
+//        
+//        Thread.sleep(3000);
+//        
+//        GuestGroup tgg2 = new GuestGroup(new Long(101));
+//        
+//        guiInterface.setGroupInfo(tgg2);
+//        
+//        Thread.sleep(50000);
+//        tgg2.setStatus(GroupStatus.SITTING);
+//        guiInterface.setGroupInfo(tgg2);
         
         
         

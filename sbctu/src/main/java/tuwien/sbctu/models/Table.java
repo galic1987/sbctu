@@ -36,10 +36,10 @@ public class Table implements Serializable{
 	public boolean leaveTable(){
 		
 		setOrder(null);
-		setBill(0);
+		setBill(0.0);
 		setGroup(null);
 		requestBill = false;
-		
+                setTabStat(TableStatus.FREE);
 		
 		return true;
 	}
@@ -100,7 +100,7 @@ public class Table implements Serializable{
 	}
 
 	public enum TableStatus {
-	FREE, USED, PAY;
+	FREE, USED, PAY, DOBILL, PAID;
 	
 	public String toString(){
 		return super.toString().toLowerCase();

@@ -25,15 +25,19 @@ import tuwien.sbctu.models.Waiter;
 import tuwien.sbctu.rmi.interfaces.ICook;
 import tuwien.sbctu.rmi.interfaces.IDriver;
 import tuwien.sbctu.rmi.interfaces.IGuestDelivery;
+import tuwien.sbctu.rmi.interfaces.IGuestGUIRMI;
 import tuwien.sbctu.rmi.interfaces.IGuestGroup;
 import tuwien.sbctu.rmi.interfaces.IPizzeria;
+import tuwien.sbctu.rmi.interfaces.IPizzeriaGUIRMI;
 import tuwien.sbctu.rmi.interfaces.IWaiter;
 
 @SuppressWarnings("serial")
 public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     String pizzeriaInfo;
+    IPizzeriaGUIRMI guiPizzeriaInterface;
+    IGuestGUIRMI guiGuestInterface;
     Double load;
-    
+
     Queue<GuestGroup> waitingEntry = new ConcurrentLinkedQueue<>();
     Queue<GuestDelivery> waitingCall = new ConcurrentLinkedQueue<>();
     List<GuestGroup> guests = Collections.synchronizedList(new ArrayList<GuestGroup>());
@@ -70,13 +74,14 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     private void prepareTables(Integer size){
         
         for (int i = 0; i < size; i++){
-            Table table = new Table(new Long(50*10+i));
+            Table table = new Table(new Long(10+i));
             tables.add(table);
+//            guiPizzeriaInterface.setTableInfo(table);
         }
     }
     
     @Override
-    public void entryPizzeria(GuestGroup guestGroup,
+    public synchronized void entryPizzeria(GuestGroup guestGroup,
     IGuestGroup guestGroupInterface) throws RemoteException {
         System.out.println("GuestGroup entered: "+guestGroup.getId());
         
@@ -92,17 +97,20 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     @Override
-    public void callPizzeria(GuestDelivery guestDelivery,
+    public synchronized void callPizzeria(GuestDelivery guestDelivery,
     IGuestDelivery guestDeliveryInterface) throws RemoteException {
         waitingCall.add(guestDelivery);
         guestDeliveries.add(guestDeliveryInterface);
         
         guestDeliveryInterface.notification("!hello");
         notifyWaiter("!phoneCall");
+        
+        guiGuestInterface.setDeliveryInfo(guestDelivery);
+//        guiPizzeriaInterface
     }
     
     @Override
-    public void beginWork(Waiter waiter, IWaiter interfaceWaiter)
+    public synchronized void beginWork(Waiter waiter, IWaiter interfaceWaiter)
             throws RemoteException {
         waiters.add(interfaceWaiter);
         
@@ -112,7 +120,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     @Override
-    public void beginWork(Cook cook, ICook cookInterface)
+    public synchronized void beginWork(Cook cook, ICook cookInterface)
             throws RemoteException {
         cooks.add(cookInterface);
         System.out.println("Cook entered: "+cook.getId());
@@ -120,7 +128,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         cookInterface.notification("!hello");
     }
     @Override
-    public void beginWork(Driver driver, IDriver interfaceDriver)
+    public synchronized void beginWork(Driver driver, IDriver interfaceDriver)
             throws RemoteException {
         drivers.add(interfaceDriver);
         System.out.println("Driver entered: "+driver.getId());
@@ -129,7 +137,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     //interface.notification should return boolean value to determine if message could be sent
-    public void notifyWaiter(String msg){
+    public synchronized void notifyWaiter(String msg){
         try {
             for(IWaiter iw : waiters){
                 iw.notification(msg);
@@ -140,7 +148,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         }
     }
     
-    public void notifyCook(String msg){
+    public synchronized void notifyCook(String msg){
         
         try {
             for(ICook ic : cooks){
@@ -152,7 +160,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         }
     }
     
-    public void notifyDriver(String msg){
+    public synchronized void notifyDriver(String msg){
         try {
             for(IDriver id : drivers){
                 id.notification(msg);
@@ -217,11 +225,12 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     @Override
-    public void sitdownGroup(Table table, GuestGroup group) throws RemoteException {
+    public synchronized void sitdownGroup(Table table, GuestGroup group) throws RemoteException {
         
         table.setGroup(group);
         table.setGroupID(group.getId());
         table.setTabStat(TableStatus.USED);
+        table.setOrder(group.getOrder());
         
         tables.add(table);
         notifyGroup(group.getId(), String.format("!table Sitting on table:%s.", table.getId()));
@@ -230,6 +239,10 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         
         //TODO GUI NOTIFY TABLE ID CHANGED STATUS
         //TODO GUI NOTIFY GROUP ID SITTING
+        if(guiGuestInterface != null)
+            guiGuestInterface.setGroupInfo(group);
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setTableInfo(table);
     }
     
     @Override
@@ -245,11 +258,19 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         }
         System.out.println("Delivery order:"+order.getId()+" waiting to be cooked.");
         //TODO GUI information
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setOrderInfo(order);
         notifyCook("!delivery");
     }
     
     @Override
     public synchronized void placeGroupOrder(Order order) throws RemoteException {
+        
+        //        double bill = 0.0;
+        for(Pizza p : order.getPizzaList()){
+            //            bill += p.getPrice();
+            groupPizzas.add(p);
+        }
         
         for(Order o : groupOrders){
             if(o.getId().equals(order.getId())){
@@ -257,12 +278,33 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
                 o.setWaiterOrderTookId(order.getWaiterOrderTookId());
             }
         }
-        for(Pizza p : order.getPizzaList()){
-            groupPizzas.add(p);
-        }
+        
         notifyGroup(order.getGroupID(), "!order");
         System.out.println("Group order:"+order.getId()+" waiting to be cooked.");
         notifyCook("!inHouse");
+        
+        //TODO GUI
+//        if(guiGuestInterface != null)
+//            guiGuestInterface.setGroupInfo(group);
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setOrderInfo(order);
+    }
+    
+    private synchronized GuestGroup findGroupInterface(Long groupID){
+        GuestGroup result = null;
+        try {
+            for(IGuestGroup iguest : guestGroups){
+                if(iguest.getGroup().getId().equals(groupID)){
+                    result = iguest.getGroup();
+                    break;
+                }
+                
+            }
+            
+        } catch (RemoteException e) {
+            System.out.println("Group is not available anymore.");
+        }
+        return result;
     }
     
     @Override
@@ -315,9 +357,13 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
                 break;
             }
         }
-        if(ord!=null)
+        
+        if(ord!=null){
             notifyWaiter("!cookedOrder Order id:"+ord.getId()+" is ready for serving.");
-
+        
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setOrderInfo(ord);
+        }
     }
     
     @Override
@@ -343,7 +389,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
             
             if(o.getOrderstatus().equals(OrderStatus.DELIVERYNEW) || o.getOrderstatus().equals(OrderStatus.DELIVERYTRANSFERRED)){
                 toMake = o.getPizzaList().size();
-//                System.out.println("TO MAKE:"+toMake);
+                //                System.out.println("TO MAKE:"+toMake);
                 for(Pizza pizza : o.getPizzaList()){
                     if(pizza.getStatus().equals(PizzaStatus.ORDERED)){
                         if( pizza.getName().equals(p.getName()) && !pizzaFound){
@@ -356,7 +402,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
                     else if(pizza.getStatus().equals(PizzaStatus.FINISHED))
                         finished++;
                 }
-//                System.out.println("TO MAKE:"+toMake+", FINISHED:"+finished);
+                //                System.out.println("TO MAKE:"+toMake+", FINISHED:"+finished);
                 if(finished == toMake){
                     o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
                     toDeliver.add(o);
@@ -374,7 +420,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     @Override
-    public synchronized Order getCookedOrder(OrderStatus status) throws RemoteException {
+    public synchronized Order getCookedOrder() throws RemoteException {
         Order order = null;
         
         for (Order o : groupOrders){
@@ -388,24 +434,29 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     }
     
     @Override
-    public void serveOrder(Order order) throws RemoteException {
+    public synchronized void serveOrder(Order order) throws RemoteException {
         for (Order o : groupOrders){
             if(o.getId().equals(order.getId())){
-                o.setOrderstatus(OrderStatus.SERVING);
+                o.setOrderstatus(order.getOrderstatus());
                 o.setWaiterServedId(order.getWaiterServedId());
                 break;
             }
         }
+//        if(guiGuestInterface != null)
+//            guiGuestInterface.setGroupInfo(group);
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setOrderInfo(order);
         notifyGroup(order.getGroupID(), "!eat");
     }
     
     @Override
-    public void deliverOrder(Order order) throws RemoteException {
+    public synchronized void deliverOrder(Order order) throws RemoteException {
         for (Order o : deliveryOrders){
             if(o.getId().equals(order.getId())){
                 o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
                 o.setWaiterServedId(order.getWaiterServedId());
-                System.out.println("Delivered or thrown away delivery order:"+o.getId());
+//                System.out.println("Delivered or thrown away delivery order:"+o.getId());
+                notifyDelivery(order.getGroupID(), "!dingdong");
                 break;
             }
         }
@@ -432,9 +483,9 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     public double getLoad() throws RemoteException {
         return load;
     }
-
+    
     @Override
-    public Order takeOneDeliveryOrder() throws RemoteException {
+    public synchronized Order takeOneDeliveryOrder() throws RemoteException {
         Order order = null;
         
         for(Order o : deliveryOrders){
@@ -444,28 +495,28 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
                 System.out.println("Transferred order:"+o.getId());
                 break;
             }
-                       
+            
         }
         
         if(order != null)
-            order.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED); 
+            order.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
         
         return order;
     }
-
+    
     @Override
-    public boolean putDeliveryOrder(Order o) throws RemoteException {
+    public synchronized boolean putDeliveryOrder(Order o) throws RemoteException {
         System.out.println("GOT Transferred order:"+o.getId());
         deliveryOrders.add(o);
         
         return true;
     }
-
+    
     @Override
     public String getAddress() throws RemoteException {
         return pizzeriaInfo;
     }
-
+    
     @Override
     public void benchmarkOrders(ArrayList<Order> orderList, Queue<Pizza> pizzas) throws RemoteException {
         System.out.println("ADDED "+orderList.size()+" orders manually.");
@@ -473,12 +524,87 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         deliveryPizzas = pizzas;
         
     }
-
+    
     @Override
     public void benchmarkStart() throws RemoteException {
         System.out.println("Benchmark started: size "+deliveryOrders.size());
         for(int i = 0; i < deliveryOrders.size(); i++){
             notifyCook("!delivery");
         }
+    }
+    
+    @Override
+    public synchronized void requestBill(GuestGroup guestGroup) throws RemoteException {
+        Long id = guestGroup.getId();
+        
+        for(Table tab : tables){
+            if(tab.getGroupID() != null){
+                if(tab.getGroupID().equals(id)){
+                    tab.setTabStat(TableStatus.PAY);
+                    tab.setBill(calculateBill(guestGroup.getOrder()));
+                    break;
+                }
+            }
+            
+        }
+        notifyWaiter("!bill"+" GuestGroup:"+id+" wants to pay.");
+    }
+    
+    public double calculateBill(Order order){
+        double result = 0.0;
+        
+        for(Pizza p: order.getPizzaList())
+            result += p.getPrice();
+        
+        return result;
+    }
+    
+    @Override
+    public synchronized Table prepareBill() throws RemoteException {
+        Table result = null;
+        
+        for(Table t : tables){
+            if(t.getTabStat().equals(TableStatus.PAY)){
+                result = t;
+                t.setTabStat(TableStatus.DOBILL);
+                break;}
+        }
+        return result;
+    }
+    
+    @Override
+    public synchronized void sendBill(Table table) throws RemoteException{
+        for(Table t : tables){
+            if(t.getId().equals(table.getId())){
+                t.getOrder().setWaiterBillProcessedId(table.getOrder().getWaiterBillProcessedId());
+                t.getOrder().setOrderstatus(OrderStatus.PAID);
+                t.setTabStat(TableStatus.PAID);
+                break;
+            }            
+        }
+        notifyGroup(table.getGroupID(), "!bill "+ table.getBill());
+    }
+    
+    @Override
+    public synchronized void payBillNLeave(Long groupID) throws RemoteException{
+        for(Table t : tables){
+            if(t.getGroupID().equals(groupID)){
+                t.leaveTable();
+                break;
+            }
+            
+        }
+    }
+
+    @Override
+    public void registerGuestGUI(IGuestGUIRMI guiInterface) throws RemoteException {
+        this.guiGuestInterface = guiInterface;
+        System.out.println("GUEST GUI registered.");
+    }
+
+    @Override
+    public void registerPizzeriaGUI(IPizzeriaGUIRMI guiInterface) throws RemoteException {
+        this.guiPizzeriaInterface = guiInterface;
+        System.out.println("PIZZERIA GUI registered.");
     }
 }

@@ -17,7 +17,7 @@ public class StartGD {
         
         
         
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 10; i++){
             Order or = new Order(new Long(7000+10*i));
             or.setOrderstatus(Order.OrderStatus.NEW);
             or.addPizzaToOrder(pizza1);
@@ -26,8 +26,8 @@ public class StartGD {
             GuestDelivery gg = new GuestDelivery(new Long(5000+i));
             gg.setGroupSize(2);
             gg.setOrder(or);
-            gg.setStatus(DeliveryStatus.WELCOME);
-            Thread t = new Thread (new GuestDeliveryRunnable(gg, 10880, "pizzeria2"));
+            gg.setStatus(DeliveryStatus.CALLED);
+            Thread t = new Thread (new GuestDeliveryRunnable(gg, 10879, "pizzeria"));
             t.start();
         }
         

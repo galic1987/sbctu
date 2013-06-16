@@ -7,9 +7,9 @@ public class Menue {
 	public enum MenuePizza implements Serializable{
 		MARGARITA, SALAMI, CARDINALE;
 		
-		public String toString(){
-			return super.toString().toLowerCase();
-		}
+//		public String toString(){
+//			return super.toString().toLowerCase();
+//		}
 	} 
 	
 	public int pizzaCount(){

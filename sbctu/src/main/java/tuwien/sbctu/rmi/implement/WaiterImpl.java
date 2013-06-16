@@ -13,8 +13,12 @@ import tuwien.sbctu.rmi.interfaces.IWaiter;
 public class WaiterImpl extends UnicastRemoteObject implements IWaiter{
     
     Waiter waiter;
-    Queue<WaiterStatus> todos = new ConcurrentLinkedQueue<>();
+    
     Queue<WaiterStatus> calls = new ConcurrentLinkedQueue<>();
+    Queue<WaiterStatus> entry = new ConcurrentLinkedQueue<>();
+    Queue<WaiterStatus> order = new ConcurrentLinkedQueue<>();
+    Queue<WaiterStatus> serve = new ConcurrentLinkedQueue<>();
+    Queue<WaiterStatus> bill = new ConcurrentLinkedQueue<>();
     
     public WaiterImpl(Waiter waiter) throws RemoteException{
         this.waiter = waiter;
@@ -24,14 +28,16 @@ public class WaiterImpl extends UnicastRemoteObject implements IWaiter{
     public synchronized void notification(String message) throws RemoteException {
         System.out.println(message);
         
-        if(message.contains("!waitingGuests"))
-            todos.add(WaiterStatus.SITDOWN);
+        if(message.contains("!bill"))
+            bill.add(WaiterStatus.BILLING);
+        else if(message.contains("!waitingGuests"))
+            entry.add(WaiterStatus.SITDOWN);
         else if(message.contains("!phoneCall"))
             calls.add(WaiterStatus.CALL);
         else if(message.contains("!orderWaiting"))
-            todos.add(WaiterStatus.GETORDER);
+            order.add(WaiterStatus.GETORDER);
         else if(message.contains("!cookedOrder"))
-            todos.add(WaiterStatus.SERVING);
+            serve.add(WaiterStatus.SERVING);
         
     }
     
@@ -47,7 +53,18 @@ public class WaiterImpl extends UnicastRemoteObject implements IWaiter{
     
     @Override
     public synchronized WaiterStatus lookupTodo() throws RemoteException {
-        return todos.poll();
+        WaiterStatus ws = null;
+        
+        if(!bill.isEmpty())
+            ws = bill.poll();        
+        else if(!serve.isEmpty())
+            ws = serve.poll();
+        else if(!order.isEmpty())
+            ws = order.poll();
+        else if(!entry.isEmpty())
+            ws = entry.poll();
+        
+        return ws;
     }
     
     @Override
