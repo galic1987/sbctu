@@ -249,35 +249,17 @@ public class Pizzeria implements NotificationListener {
 
 
 	
-	public ArrayList<Order> getArchive(){
+	public int goodDeliveries(){
 		// saves the load inside
+		int i = 0;
 				TransactionReference tx;
 				try {
-					//working.set(true);
 					tx = capi.createTransaction(timeOut , space);
 					ArrayList<Order> orders = new ArrayList<Order>();
-					// ArrayList<Table> tablesArr = new ArrayList<Table>();
-
-					// query coordinator
-					//Query qo1 = new Query().cnt(Query.ALL).sql("");
-
-					
-					
-					//System.out.println(capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo1,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx));
-
-					orders = capi.read(archive, Arrays.asList(AnyCoordinator.newSelector(Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
-					
-
-					//Order o = orders.get(0);
-					
-					//System.out.println(capi.read(bar, Arrays.asList(QueryCoordinator.newSelector(qo))  , RequestTimeout.DEFAULT, tx).size());
-
-
+					Query qo = new Query().sql("status = 'DELIVERYFINISHED'");
+					i =  capi.test(archive, Arrays.asList(QueryCoordinator.newSelector(qo,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
 					capi.commitTransaction(tx);
-					
-					return orders;
-
-
+					return i;
 				} catch ( Exception e) {
 					// AutoRollback
 					//load = 0;
@@ -285,9 +267,31 @@ public class Pizzeria implements NotificationListener {
 				}finally{
 					//working.set(false);
 				}
+return 0;
 
+	}
+	
+	
+	public int failDeliveries(){
+		// saves the load inside
+		int i = 0;
+				TransactionReference tx;
+				try {
+					tx = capi.createTransaction(timeOut , space);
+					ArrayList<Order> orders = new ArrayList<Order>();
+					Query qo = new Query().sql("status = 'DELIVERYFAILED'");
+					i =  capi.test(archive, Arrays.asList(QueryCoordinator.newSelector(qo,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+					capi.commitTransaction(tx);
+					return i;
+				} catch ( Exception e) {
+					// AutoRollback
+					//load = 0;
+					//e.printStackTrace();
+				}finally{
+					//working.set(false);
+				}
+return 0;
 
-				return null;
 	}
 
 

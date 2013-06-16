@@ -19,15 +19,16 @@ public class App
 
 
 	private static IPizzeriaGUI guiInterface = null;
-	private static Pizzeria[] p;
-	
+	private static Pizzeria[] p; 
+	private static GUIPizzeria  gui = null;
 	private static int transferedNr = 0;
+	private static boolean active;
 
 	public static void main( String[] args )
 	{
 		//System.out.println( "Hello World!" + args );
 
-
+active = false;
 
 		p = new Pizzeria[args.length];
 		for (int i = 0; i < args.length; i++) { 
@@ -43,12 +44,11 @@ public class App
 
 
 
-		guiInterface = new PizzeriaGUIImpl();
-
-		GUIPizzeria  gui = new GUIPizzeria();
-		gui.setPizzeriaInformationInterface(guiInterface);
-		gui.setVisible(true);
-
+//		guiInterface = new PizzeriaGUIImpl();
+//
+//	   gui = new GUIPizzeria();
+//		gui.setPizzeriaInformationInterface(guiInterface);
+//		gui.setVisible(true);
 
 		// more than 1 pizzeria, start loadbalancing
 		if(args.length>1){
@@ -129,13 +129,13 @@ public class App
 
 
 			try {	
+				System.out.println("Transfered # " + transferedNr);
+				updategui();
 
 				if(everythingOK) Thread.sleep(3000);
-				updategui();
-				System.out.println("Transfered # " + transferedNr);
 
 
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
@@ -144,11 +144,40 @@ public class App
 
 
 	public static void updategui(){
+		int deliveryGood = 0;
+		int deliveryFailed = 0;
+
 		for (int i = 0; i < p.length; i++) { 
 			Pizzeria pizz = p[i];
 			
+			try {	
+				
 			
+deliveryGood += pizz.goodDeliveries();
+deliveryFailed += pizz.failDeliveries();
+				
+				//System.out.println(pizz.getArchive().size());
+//			for(Order o :pizz.getArchive() ) guiInterface.setArchiveInfo(o);
+			//for(Order o :pizz.getArchive() ) System.out.println(o.toString());
+
+//			if(!active){
+//				gui.activateThread();
+//			active = true;
+//			}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+
+
 		}
+		
+		System.out.println("Good deliveries " + deliveryGood);
+		System.out.println("Bad deliveries " + deliveryFailed);
+		
 	}
 
 }

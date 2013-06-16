@@ -67,7 +67,7 @@ public class Simulation1 {
         
         System.out.println(id);
 
-		for (int i = 1; i < 100; i++){
+		for (int i = 18000; i < 18101; i++){
 		//Order o = new Order(id+i);
         RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p);
         

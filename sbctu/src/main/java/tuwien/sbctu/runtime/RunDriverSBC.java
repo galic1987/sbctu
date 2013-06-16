@@ -191,7 +191,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				// write a bill
 				
 				
-				System.out.println("Writing bill for order id " + o.getId() + " bill " + o.writeBill() + " trying to deliver");
+				//System.out.println("Writing bill for order id " + o.getId() + " bill " + o.writeBill() + " trying to deliver");
 
 				capi.commitTransaction(tx);
 
@@ -221,7 +221,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				
 
 			} catch ( Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				try{
 				// write in archive not delivered 
 					

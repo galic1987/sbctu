@@ -258,6 +258,7 @@ public class RunCookSBC implements NotificationListener {
 		// TODO Auto-generated method stub
 		if(working.get() == true) return;
 
+		cookForDelivery();
 		cook();
 
 

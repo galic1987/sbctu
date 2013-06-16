@@ -101,19 +101,28 @@ public class RunWaiterSBC implements NotificationListener{
 				try {
 				//System.out.println("-----> Starting all over again");
 
-				
-				
+					if (working.get()) continue;
+
 				if(checkTheDeliveryOrders()) continue;
 				
 				
 				// 1. entrance check -> check entrance, and bring the guestgroups to table -> make table
 				entranceTake();
+				if (working.get()) continue;
+
 				// 2. tables -> if order ORDERED -> put it on the theke -> status ORDERONBAR
 				ordersTake();
+				if (working.get()) continue;
+
 				// 3. if order FINISHED , take it from theke and take the table and write table
 				putThemToEat();
+				if (working.get()) continue;
+
+				
 				// 4. if there BILL request read it -> log it and delete it		
 				doTheBilling();
+				if (working.get()) continue;
+
 				// 5. take the deliveries to bar
 
 				// sleep for a while, it is hard day
@@ -121,7 +130,7 @@ public class RunWaiterSBC implements NotificationListener{
 					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 
@@ -302,7 +311,7 @@ public class RunWaiterSBC implements NotificationListener{
 				Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
 				capi.write(entry, bar,timeOut,tx);
 
-				System.out.println("Delivery -> Bar " +  o.getId());
+				System.out.println("Waiterdoes: Delivery -> Bar " +  o.getId());
 			}
 			
 			capi.commitTransaction(tx);
