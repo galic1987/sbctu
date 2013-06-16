@@ -35,6 +35,7 @@ import tuwien.sbctu.conf.PizzeriaConfiguration;
 import tuwien.sbctu.models.DeliveryAddress;
 import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
+import tuwien.sbctu.models.Order.OrderStatus;
 import tuwien.sbctu.models.Pizza;
 import tuwien.sbctu.models.Table;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
@@ -104,9 +105,10 @@ public class RunDeliveryGuestSBC implements NotificationListener {
 			o.setId(id);
 			o.setPizzaList(pizz);
 			o.setDeliveryAddress(deliveryAddress);
+		//	o.setOrderstatus(OrderStatus.DELIVERYNEW);
 			
 			
-		    Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));
+		    Entry entry = new Entry(o, Arrays.asList(QueryCoordinator.newCoordinationData(),KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));
 		  //Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
 
 			

@@ -70,7 +70,7 @@ public class App
 
 			int difference = (int) ((int) maxLoad.getLoad()-minLoad.getLoad());
 			
-			System.out.println("Loadbalancer calculating!");
+			System.out.println("Loadbalancer calculating! maxmin " + maxLoad.getLoad() + " >= " + minLoad.getLoad());
 
 			
 			// check if there is something to do , number of newDeliveries orders

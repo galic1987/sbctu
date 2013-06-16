@@ -26,6 +26,7 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.Server;
 import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
+import org.mozartspaces.core.MzsConstants.Selecting;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
@@ -57,7 +58,7 @@ public class Pizzeria implements NotificationListener {
 	private ContainerReference delivery;
 	private ContainerReference archive;
 
-	private double load;
+	private double load = 0;
 	private long timeOut = 10000;
 
 	
@@ -105,7 +106,6 @@ public class Pizzeria implements NotificationListener {
 		ArrayList<Coordinator> tableCoords = new ArrayList<Coordinator>();
 		tableCoords.add(new KeyCoordinator());
 		tableCoords.add(new QueryCoordinator());
-		tableCoords.add(new AnyCoordinator());
 
 
 
@@ -125,7 +125,7 @@ public class Pizzeria implements NotificationListener {
 		
 		// delivery queue (telephone)
 		delivery = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, MzsConstants.Container.UNBOUNDED, obligatoryCoords, 
-				null,null);
+				Arrays.asList(new QueryCoordinator()),null);
 
 		// archive for log
 		archive = capi.createContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, MzsConstants.Container.UNBOUNDED, tableCoords, 
@@ -281,17 +281,26 @@ public class Pizzeria implements NotificationListener {
 
 			// query coordinator
 			Query qo = new Query().sql("status = 'DELIVERYNEW'");
+			//Query qo1 = new Query().cnt(Query.ALL).sql("");
 
-			orders = capi.read(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
+			
+			
+			//System.out.println(capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo1,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx));
+
+			load = (double) capi.test(bar, Arrays.asList(QueryCoordinator.newSelector(qo,Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+			
+
 			//Order o = orders.get(0);
-			load = (double) orders.size();
+			
+			//System.out.println(capi.read(bar, Arrays.asList(QueryCoordinator.newSelector(qo))  , RequestTimeout.DEFAULT, tx).size());
+
 
 			capi.commitTransaction(tx);
 
 
 		} catch ( Exception e) {
 			// AutoRollback
-			load = 0;
+			//load = 0;
 			//e.printStackTrace();
 		}finally{
 			//working.set(false);
@@ -313,7 +322,7 @@ public class Pizzeria implements NotificationListener {
 	
         	tx = capi.createTransaction(timeOut, space);
 
-			 a.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
+			 //a.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
 
 
 			Entry orderEntry = new Entry(a, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(a.getId())), QueryCoordinator.newCoordinationData()));

@@ -24,6 +24,7 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.Request;
 import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
+import org.mozartspaces.core.MzsConstants.Selecting;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
@@ -88,7 +89,7 @@ public class RunCookSBC implements NotificationListener {
 				
 				try {
 				// take order and start cooking  
-				if(cookForDeliveryTransferPriority()) continue; // if there is transfered delivery, 
+				//if(cookForDeliveryTransferPriority()) continue; // if there is transfered delivery, 
 				if(cookForDelivery()) continue; // if there is delivery, try to cook for delivery again
 				
 				cook();// othervise cook normal orders
@@ -167,8 +168,11 @@ public class RunCookSBC implements NotificationListener {
 			// query coordinator
 			Query qo = new Query().sql("status = 'DELIVERYNEW' LIMIT 1");
 			
-			orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
+			orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo,1)) , RequestTimeout.TRY_ONCE, tx);
 			Order o = orders.get(0);
+			
+			System.out.println(orders.size());
+
 			System.out.println(o.toString());
 			//            for (Pizza p : o.getPizzaList()) {
 			c.cookPizzasFromOrder(o);

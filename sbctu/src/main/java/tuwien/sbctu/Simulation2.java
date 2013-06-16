@@ -67,9 +67,9 @@ public class Simulation2 {
 			p1.add(new Pizza("Margarite", 5.0f, 3));
 			p1.add(new Pizza("Salami", 5.5f, 7));
 
-			for (int i = 100; i < 200; i++){
+			for (int i = 200; i < 301; i++){
 				//Order o = new Order(id+i);
-				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i+2000, id+i+2000, spaceAddress, p1);
+				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p1);
 
 				//  System.out.println(id+i);
 				//	        Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));
@@ -86,11 +86,11 @@ public class Simulation2 {
 			p.add(new Pizza("Salami", 5.5f, 7));
 			p.add(new Pizza("Cardinale", 6.0f, 5));	
 
-			System.out.println(id);
+			//System.out.println(id);
 
-			for (int i = 1; i < 100; i++){
+			for (int i = 400; i < 501; i++){
 				//Order o = new Order(id+i);
-				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i+1000, id+i+1000, spaceAddress, p);
+				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(port+i, id+i, spaceAddress, p);
 
 				//  System.out.println(id+i);
 				//        Entry entry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId()))));

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.KeyCoordinator;
@@ -19,6 +20,7 @@ import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
+import org.mozartspaces.core.MzsConstants.Selecting;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
@@ -97,10 +99,12 @@ public class RunWaiterSBC implements NotificationListener{
 
 			for (;;) {
 				try {
-				System.out.println("-----> Starting all over again");
+				//System.out.println("-----> Starting all over again");
 
+				
+				
 				if(checkTheDeliveryOrders()) continue;
-
+				
 				
 				// 1. entrance check -> check entrance, and bring the guestgroups to table -> make table
 				entranceTake();
@@ -112,10 +116,9 @@ public class RunWaiterSBC implements NotificationListener{
 				doTheBilling();
 				// 5. take the deliveries to bar
 
-
 				// sleep for a while, it is hard day
 				
-					Thread.sleep(3000);
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -290,8 +293,8 @@ public class RunWaiterSBC implements NotificationListener{
 			tx = capi.createTransaction(timeOut, space);
 			ArrayList<Order> entries = new ArrayList<Order>();
 
-			entries = capi.take(delivery, Arrays.asList(FifoCoordinator.newSelector()) , RequestTimeout.TRY_ONCE, tx);
-			
+			entries = capi.take(delivery, Arrays.asList(AnyCoordinator.newSelector(Selecting.COUNT_ALL)) , RequestTimeout.TRY_ONCE, tx);
+			System.out.println(entries.size());
 			
 			for (Order o : entries){
 				o.setOrderstatus(OrderStatus.DELIVERYNEW);
@@ -303,6 +306,8 @@ public class RunWaiterSBC implements NotificationListener{
 			}
 			
 			capi.commitTransaction(tx);
+			if(entries.size()==0) return false;
+			
 			return true;
 		} catch ( Exception e) {
 			// AutoRollback
@@ -315,6 +320,10 @@ public class RunWaiterSBC implements NotificationListener{
 		}	
 	}
 
+	
+	
+	
+	
 
 	public static void printExp(Exception e){
 		//e.printStackTrace();
