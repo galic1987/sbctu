@@ -44,7 +44,8 @@ public class RMIPizzeriaGUIImpl extends UnicastRemoteObject implements IPizzeria
 
     @Override
     public void setOrderInfo(Order order) {
-        orderQueue.add(order);
+        if(order!=null)
+            orderQueue.add(order);
     }
     
     @Override

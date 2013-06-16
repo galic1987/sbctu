@@ -37,7 +37,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     IPizzeriaGUIRMI guiPizzeriaInterface;
     IGuestGUIRMI guiGuestInterface;
     Double load;
-
+    
     Queue<GuestGroup> waitingEntry = new ConcurrentLinkedQueue<>();
     Queue<GuestDelivery> waitingCall = new ConcurrentLinkedQueue<>();
     List<GuestGroup> guests = Collections.synchronizedList(new ArrayList<GuestGroup>());
@@ -71,12 +71,11 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         this.pizzeriaInfo = pizzeriaInfo;
     }
     
-    private void prepareTables(Integer size){
+    private void prepareTables(Integer size) throws RemoteException{
         
         for (int i = 0; i < size; i++){
             Table table = new Table(new Long(10+i));
             tables.add(table);
-//            guiPizzeriaInterface.setTableInfo(table);
         }
     }
     
@@ -89,11 +88,13 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         guestGroups.add(guestGroupInterface);
         
         guestGroupInterface.notification("!welcome");
+        guiPizzeriaInterface.setGuestGroupInfo(guestGroup);
         
         if(waiters != null)
             notifyWaiter("!waitingGuests");
         else
             remainingNotifiers.add("!waitingGuests");
+        
     }
     
     @Override
@@ -106,7 +107,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         notifyWaiter("!phoneCall");
         
         guiGuestInterface.setDeliveryInfo(guestDelivery);
-//        guiPizzeriaInterface
+        //TODO        guiPizzeriaInterface
     }
     
     @Override
@@ -118,7 +119,6 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         
         interfaceWaiter.notification("!hello");
     }
-    
     @Override
     public synchronized void beginWork(Cook cook, ICook cookInterface)
             throws RemoteException {
@@ -135,7 +135,6 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         
         interfaceDriver.notification("!hello");
     }
-    
     //interface.notification should return boolean value to determine if message could be sent
     public synchronized void notifyWaiter(String msg){
         try {
@@ -147,7 +146,6 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
             e.printStackTrace();
         }
     }
-    
     public synchronized void notifyCook(String msg){
         
         try {
@@ -159,7 +157,6 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
             e.printStackTrace();
         }
     }
-    
     public synchronized void notifyDriver(String msg){
         try {
             for(IDriver id : drivers){
@@ -183,7 +180,6 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
             System.out.println("Group is not available anymore.");
         }
     }
-    
     @Override
     public synchronized void notifyDelivery(Long id, String msg) throws RemoteException{
         try {
@@ -284,8 +280,8 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         notifyCook("!inHouse");
         
         //TODO GUI
-//        if(guiGuestInterface != null)
-//            guiGuestInterface.setGroupInfo(group);
+        if(guiGuestInterface != null)
+            guiGuestInterface.setGroupInfo(findGroupInterface(order.getGroupID()));
         if(guiPizzeriaInterface != null)
             guiPizzeriaInterface.setOrderInfo(order);
     }
@@ -311,11 +307,24 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     public synchronized void makeOrder(Order order) throws RemoteException {
         
         System.out.println("Group "+ order.getGroupID()+ " wants to order.");
+        order.setTableID(tableIdByGuestId(order.getGroupID()));
         groupOrders.add(order);
         
         notifyWaiter("!orderWaiting");
         
-        //TODO GUI INFO
+    }
+    
+    private synchronized Long tableIdByGuestId(Long gId){
+        Long result = null;
+        for(Table t : tables)
+        {
+            if(t.getGroupID().equals(gId) ){
+                result = t.getId();
+                break;
+            }
+            
+        }
+        return result;
     }
     
     @Override
@@ -334,36 +343,88 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         }
         
         //TODO inform GUI for new order
+        if(guiPizzeriaInterface != null)
+            guiPizzeriaInterface.setOrderInfo(newOrder);
         
         return newOrder;
     }
     
     @Override
     public synchronized void cookGroupPizza() throws RemoteException {
-        Order ord = null;
-        for(Order o : groupOrders){
+        Pizza p = groupPizzas.poll();
+        
+        if(p!= null){
+            try {
+                System.out.println("Cooking "+p.getName()+" takes "+p.getPrepareTime());
+                Thread.sleep(new Long(p.getPrepareTime()*1000));
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PizzeriaImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
-            if(o.getOrderstatus().equals(OrderStatus.ORDERED)){
-                o.setOrderstatus(OrderStatus.COOKED);
-                System.out.println("Order:"+o.getId()+"is cooked by cook.");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(PizzeriaImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Order ord = null;
+            
+            for(Order o : groupOrders){
+                boolean pizzaFound = false;
+                
+                int finished = 0;
+                int toMake = 0;
+                
+                if(o.getOrderstatus().equals(OrderStatus.PROCESSING) || o.getOrderstatus().equals(OrderStatus.ORDERED)){
+                    toMake = o.getPizzaList().size();
+                    for(Pizza pizza : o.getPizzaList()){
+                        if(pizza.getStatus().equals(PizzaStatus.ORDERED)){
+                            if( pizza.getName().equals(p.getName()) && !pizzaFound){
+                                pizza.setStatus(PizzaStatus.FINISHED);
+                                pizzaFound = true;
+                                finished++;
+                                o.setOrderstatus(OrderStatus.PROCESSING);
+                                guiPizzeriaInterface.setOrderInfo(o);
+                            }
+                        }
+                        else if(pizza.getStatus().equals(PizzaStatus.FINISHED))
+                            finished++;
+                    }
+                    ord = o;
+                    
+                    if(finished == toMake){
+                        o.setOrderstatus(OrderStatus.COOKED);
+                        toDeliver.add(o);
+                        guiPizzeriaInterface.setOrderInfo(o);
+                        notifyWaiter("!cookedOrder Order id:"+ord.getId()+" is ready for serving.");
+                        finished = 0;
+                        toMake = 0;
+                    }
+                    
+                    if(pizzaFound)
+                        break;
                 }
                 
-                //                o.setOrderstatus(OrderStatus.COOKED);
-                ord = o;
-                break;
             }
         }
-        
-        if(ord!=null){
-            notifyWaiter("!cookedOrder Order id:"+ord.getId()+" is ready for serving.");
-        
-        if(guiPizzeriaInterface != null)
-            guiPizzeriaInterface.setOrderInfo(ord);
-        }
+        //        Order ord = null;
+        //        for(Order o : groupOrders){
+        //
+        //            if(o.getOrderstatus().equals(OrderStatus.ORDERED)){
+        //                o.setOrderstatus(OrderStatus.COOKED);
+        //                System.out.println("Order:"+o.getId()+"is cooked by cook.");
+        //                try {
+        //                    Thread.sleep(2000);
+        //                } catch (InterruptedException ex) {
+        //                    Logger.getLogger(PizzeriaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        //                }
+        //
+        //                //                o.setOrderstatus(OrderStatus.COOKED);
+        //                ord = o;
+        //                break;
+        //            }
+        //        }
+        //
+        //        if(ord!=null){
+        //            notifyWaiter("!cookedOrder Order id:"+ord.getId()+" is ready for serving.");
+        //
+        //            if(guiPizzeriaInterface != null)
+        //                guiPizzeriaInterface.setOrderInfo(ord);
+        //        }
     }
     
     @Override
@@ -371,52 +432,90 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         
         Pizza p = deliveryPizzas.poll();
         
-        
-        try {
-            System.out.println("Cooking "+p.getName()+" takes "+p.getPrepareTime());
-            Thread.sleep(new Long(p.getPrepareTime()*1000));
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PizzeriaImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        Order ord = null;
-        
-        for(Order o : deliveryOrders){
-            boolean pizzaFound = false;
-            //            System.out.println("Begin cooking deliveryOrder");
-            int finished = 0;
-            int toMake = 0;
-            
-            if(o.getOrderstatus().equals(OrderStatus.DELIVERYNEW) || o.getOrderstatus().equals(OrderStatus.DELIVERYTRANSFERRED)){
-                toMake = o.getPizzaList().size();
-                //                System.out.println("TO MAKE:"+toMake);
-                for(Pizza pizza : o.getPizzaList()){
-                    if(pizza.getStatus().equals(PizzaStatus.ORDERED)){
-                        if( pizza.getName().equals(p.getName()) && !pizzaFound){
-                            System.out.println("FOUND ORDER FOR PIZZA");
-                            pizza.setStatus(PizzaStatus.FINISHED);
-                            pizzaFound = true;
-                            finished++;
-                        }
-                    }
-                    else if(pizza.getStatus().equals(PizzaStatus.FINISHED))
-                        finished++;
-                }
-                //                System.out.println("TO MAKE:"+toMake+", FINISHED:"+finished);
-                if(finished == toMake){
-                    o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
-                    toDeliver.add(o);
-                    notifyDriver("!delivery order id:"+o.getId()+" finished");
-                    finished = 0;
-                    toMake = 0;
-                }
-                ord = o;
-                
-                if(pizzaFound)
-                    break;
+        if(p!= null){
+            try {
+                System.out.println("Cooking "+p.getName()+" takes "+p.getPrepareTime());
+                Thread.sleep(new Long(p.getPrepareTime()*1000));
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PizzeriaImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+            Order ord = null;
+            
+            for(Order o : deliveryOrders){
+                boolean pizzaFound = false;
+                int finished = 0;
+                int toMake = 0;
+                
+                if(o.getOrderstatus().equals(OrderStatus.DELIVERYCOOKING)
+                        
+                        || o.getOrderstatus().equals(OrderStatus.DELIVERYNEW) ){
+                    toMake = o.getPizzaList().size();
+                    //                System.out.println("TO MAKE:"+toMake);
+                    for(Pizza pizza : o.getPizzaList()){
+                        if(pizza.getStatus().equals(PizzaStatus.ORDERED)){
+                            if( pizza.getName().equals(p.getName()) && !pizzaFound){
+                                pizza.setStatus(PizzaStatus.FINISHED);
+                                o.setOrderstatus(OrderStatus.DELIVERYCOOKING);
+                                guiPizzeriaInterface.setOrderInfo(o);
+                                pizzaFound = true;
+                                finished++;
+                            }
+                        }
+                        else if(pizza.getStatus().equals(PizzaStatus.FINISHED))
+                            finished++;
+                    }
+                    
+                    ord = o;
+                    
+                    if(finished == toMake){
+                        o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
+                        toDeliver.add(o);
+                        guiPizzeriaInterface.setOrderInfo(o);
+                        notifyDriver("!delivery order id:"+o.getId()+" finished");
+                        finished = 0;
+                        toMake = 0;
+                    }
+                    
+                    if(pizzaFound)
+                        break;
+                }
+                
+                else if( o.getOrderstatus().equals(OrderStatus.DELIVERYTRANSFERRED)){
+                        toMake = o.getPizzaList().size();
+                    //                System.out.println("TO MAKE:"+toMake);
+                    for(Pizza pizza : o.getPizzaList()){
+                        if(pizza.getStatus().equals(PizzaStatus.ORDERED)){
+                            if( pizza.getName().equals(p.getName()) && !pizzaFound){
+                                pizza.setStatus(PizzaStatus.FINISHED);
+                                o.setOrderstatus(OrderStatus.DELIVERYCOOKING);
+                                guiPizzeriaInterface.setOrderInfo(o);
+                                pizzaFound = true;
+                                finished++;
+                            }
+                        }
+                        else if(pizza.getStatus().equals(PizzaStatus.FINISHED))
+                            finished++;
+                    }
+                    ord = o;
+                    
+                    if(finished == toMake){
+                        o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
+                        toDeliver.add(o);
+                        guiPizzeriaInterface.setOrderInfo(o);
+                        notifyDriver("!delivery order id:"+o.getId()+" finished");
+                        finished = 0;
+                        toMake = 0;
+                    }
+                    
+                    if(pizzaFound)
+                        break;
+                }
+                
+            }
         }
+        
+        
     }
     
     @Override
@@ -437,16 +536,19 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     public synchronized void serveOrder(Order order) throws RemoteException {
         for (Order o : groupOrders){
             if(o.getId().equals(order.getId())){
-                o.setOrderstatus(order.getOrderstatus());
+                o.setOrderstatus(OrderStatus.SERVING);
                 o.setWaiterServedId(order.getWaiterServedId());
                 break;
             }
         }
-//        if(guiGuestInterface != null)
-//            guiGuestInterface.setGroupInfo(group);
-        if(guiPizzeriaInterface != null)
-            guiPizzeriaInterface.setOrderInfo(order);
+        
+        guiPizzeriaInterface.setOrderInfo(order);
+        
         notifyGroup(order.getGroupID(), "!eat");
+        GuestGroup gg = new GuestGroup(order.getGroupID());
+        gg.setStatus(GuestGroup.GroupStatus.EATING);
+        System.out.println("serveOrder for group:"+gg.getId());
+        //        guiGuestInterface.setGroupInfo(gg);
     }
     
     @Override
@@ -455,8 +557,14 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
             if(o.getId().equals(order.getId())){
                 o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
                 o.setWaiterServedId(order.getWaiterServedId());
-//                System.out.println("Delivered or thrown away delivery order:"+o.getId());
+                //                System.out.println("Delivered or thrown away delivery order:"+o.getId());
                 notifyDelivery(order.getGroupID(), "!dingdong");
+                
+                //                GuestGroup gg = new GuestGroup(order.);
+                //        gg.setStatus(GuestGroup.GroupStatus.EATING);
+                //
+                //        guiGuestInterface.setGroupInfo(gg);
+                
                 break;
             }
         }
@@ -471,12 +579,20 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     @Override
     public synchronized double calculatePizzeriaLoad() throws RemoteException {
         int count = 0;
-        for(Order order : deliveryOrders){
-            if(order.getOrderstatus().equals(OrderStatus.DELIVERYNEW))
-                count++;
+        
+        double some = 0.0;
+        
+        if(!deliveryOrders.isEmpty())
+        {
+            for(Order order : deliveryOrders){
+                if(order.getOrderstatus().equals(OrderStatus.DELIVERYNEW))
+                    count++;
+            }
+            some = Double.valueOf(count);
         }
-        load = Double.valueOf(count);
-        return load;
+        load = some;
+//        System.out.println(some);
+        return some;
     }
     
     @Override
@@ -493,13 +609,15 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
                 order = o;
                 o.setOrderstatus(OrderStatus.TRANSFERRED);
                 System.out.println("Transferred order:"+o.getId());
+                order.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
+                guiPizzeriaInterface.setOrderInfo(order);
                 break;
             }
             
         }
         
-        if(order != null)
-            order.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
+//        if(order != null)
+//            order.setOrderstatus(OrderStatus.DELIVERYTRANSFERRED);
         
         return order;
     }
@@ -507,6 +625,7 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
     @Override
     public synchronized boolean putDeliveryOrder(Order o) throws RemoteException {
         System.out.println("GOT Transferred order:"+o.getId());
+        guiPizzeriaInterface.setOrderInfo(o);
         deliveryOrders.add(o);
         
         return true;
@@ -577,34 +696,51 @@ public class PizzeriaImpl extends UnicastRemoteObject implements IPizzeria{
         for(Table t : tables){
             if(t.getId().equals(table.getId())){
                 t.getOrder().setWaiterBillProcessedId(table.getOrder().getWaiterBillProcessedId());
+                t.getOrder().setWaiterOrderTookId(table.getOrder().getWaiterOrderTookId());
+                t.getOrder().setWaiterServedId(table.getOrder().getWaiterServedId());
+                t.getOrder().setTableID(table.getOrder().getTableID());
                 t.getOrder().setOrderstatus(OrderStatus.PAID);
+                guiPizzeriaInterface.setOrderInfo(t.getOrder());
                 t.setTabStat(TableStatus.PAID);
                 break;
-            }            
+            }
         }
+        table.getGroup().setStatus(GuestGroup.GroupStatus.BILL);
+        guiGuestInterface.setGroupInfo(table.getGroup());
+        
         notifyGroup(table.getGroupID(), "!bill "+ table.getBill());
     }
     
     @Override
     public synchronized void payBillNLeave(Long groupID) throws RemoteException{
         for(Table t : tables){
-            if(t.getGroupID().equals(groupID)){
-                t.leaveTable();
-                break;
+            if(groupID != null){
+                if(t.getGroupID().equals(groupID)){
+                    t.leaveTable();
+                    GuestGroup g = findGroupInterface(groupID);
+                    g.setStatus(GuestGroup.GroupStatus.FINISHED);
+                    guiGuestInterface.setGroupInfo(g);
+                    guiPizzeriaInterface.setTableInfo(t);
+                    break;
+                }
             }
             
         }
     }
-
+    
     @Override
     public void registerGuestGUI(IGuestGUIRMI guiInterface) throws RemoteException {
         this.guiGuestInterface = guiInterface;
         System.out.println("GUEST GUI registered.");
     }
-
+    
     @Override
     public void registerPizzeriaGUI(IPizzeriaGUIRMI guiInterface) throws RemoteException {
+        
         this.guiPizzeriaInterface = guiInterface;
         System.out.println("PIZZERIA GUI registered.");
+        for(Table t: tables)
+            guiPizzeriaInterface.setTableInfo(t);
+        
     }
 }

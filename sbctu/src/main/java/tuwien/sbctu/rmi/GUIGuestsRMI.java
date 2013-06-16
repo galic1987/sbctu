@@ -41,7 +41,7 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
     private IGuestGUIRMI guestTableInformation;
     private IPizzeria iPizzeria;
     private int port;
-    private String bindingName; 
+    private String bindingName;
     
     private int groupID = 1000;
     private int deliveryID = 4000;
@@ -66,6 +66,10 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
         
         port = 10879;
         bindingName = "pizzeria";
+        
+        groupID = (port-10800)*100+100;
+        deliveryID = (port-10800)*100+400;
+        orderID = (port-10800)*100+600;
     }
     
     /**
@@ -148,7 +152,7 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
             }
         });
 
-        deliveryTable.setModel(new tuwien.sbctu.gui.tablemodels.GroupsTableModel());
+        deliveryTable.setModel(new tuwien.sbctu.gui.tablemodels.DeliveryTableModel());
         jScrollPane3.setViewportView(deliveryTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -348,14 +352,14 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
     }
     
     private Pizza preparePizza(String val){
-    Pizza p = null;
-    if(val.equals("Margarita"))
-        p = new Pizza("MARGARITA", 5.0 , 3);
-    if(val.equals("Salami"))
-        p = new Pizza("SALAMI", 5.5 , 7);
-    if(val.equals("Cardinale"))
-        p = new Pizza("CARDINALE", 6.0 , 6);
-    return p;
+        Pizza p = null;
+        if(val.equals("Margarita"))
+            p = new Pizza("MARGARITA", 5.0 , 3);
+        if(val.equals("Salami"))
+            p = new Pizza("SALAMI", 5.5 , 7);
+        if(val.equals("Cardinale"))
+            p = new Pizza("CARDINALE", 6.0 , 6);
+        return p;
     }
     
     private void prepareFields(){
@@ -410,28 +414,22 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
         
         try {
             
-            //                System.out.println("started gui: updateTables()");
-            //        while(isActive){
-            //
             GuestGroup ggi = guestTableInformation.getGroupInfo();
+            GuestDelivery gdi = guestTableInformation.getDeliveryInfo();
             
             if(ggi != null)
                 updateGroup(ggi);
-            
-            //                updateDelivery();
+            if(gdi != null)
+                updateDelivery(gdi);
             
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(GUIGuests.class.getName()).log(Level.SEVERE, null, ex);
             }
-            //
-            //        }
         } catch (RemoteException ex) {
             Logger.getLogger(GUIGuestsRMI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //
-        //        }
     }
     
     private void updateGroup(GuestGroup ggi){
@@ -459,35 +457,57 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
         guestTable.setModel(gtm);
     }
     
-    private void updateDelivery(){
-        try {
-            boolean foundGG = false;
-            DeliveryTableModel dtm = new DeliveryTableModel();
-            GuestDelivery gdi = guestTableInformation.getDeliveryInfo();
-            
-            if(!guestDeliveryInfo.isEmpty()){
-                for(GuestDelivery gg : guestDeliveryInfo){
-                    
-                    if(gg.getId().equals(gdi.getId())){
-                        gg.setCurrentStatus(gdi.getCurrentStatus());
-                        foundGG = true;
-                    }
+    private void updateDelivery(GuestDelivery gdi){
+        boolean foundGG = false;
+        DeliveryTableModel gtm = new DeliveryTableModel();
+        
+        if(!guestDeliveryInfo.isEmpty()){
+            for(GuestDelivery gg : guestDeliveryInfo){
+                
+                if(gg.getId().equals(gdi.getId())){
+                    gg.setStatus(gdi.getStatus());
+                    foundGG = true;
                 }
             }
-            
-            if (!foundGG)
-                guestDeliveryInfo.add(gdi);
-            
-            if(!guestDeliveryInfo.isEmpty()){
-                for(GuestDelivery gg : guestDeliveryInfo)
-                    dtm.add(gg);
-                
-                deliveryTable.setModel(dtm);
-                
-            }
-        } catch (RemoteException ex) {
-            Logger.getLogger(GUIGuestsRMI.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        if (!foundGG)
+            guestDeliveryInfo.add(gdi);
+        
+        if(!guestDeliveryInfo.isEmpty()){
+            for(GuestDelivery gg : guestDeliveryInfo)
+                gtm.add(gg);
+            
+        }
+        deliveryTable.setModel(gtm);
+        //        try {
+        //            boolean foundGG = false;
+        //            DeliveryTableModel dtm = new DeliveryTableModel();
+        //            GuestDelivery gdi = guestTableInformation.getDeliveryInfo();
+        //
+        //            if(!guestDeliveryInfo.isEmpty()){
+        //                for(GuestDelivery gg : guestDeliveryInfo){
+        //
+        //                    if(gg.getId().equals(gdi.getId())){
+        //                        gg.setCurrentStatus(gdi.getCurrentStatus());
+        //                        foundGG = true;
+        //                    }
+        //                }
+        //            }
+        //
+        //            if (!foundGG)
+        //                guestDeliveryInfo.add(gdi);
+        //
+        //            if(!guestDeliveryInfo.isEmpty()){
+        //                for(GuestDelivery gg : guestDeliveryInfo)
+        //                    dtm.add(gg);
+        //
+        //                deliveryTable.setModel(dtm);
+        //
+        //            }
+        //        } catch (RemoteException ex) {
+        //            Logger.getLogger(GUIGuestsRMI.class.getName()).log(Level.SEVERE, null, ex);
+        //        }
     }
     
     private class Updater extends Thread {

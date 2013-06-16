@@ -5,6 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tuwien.sbctu.models.GuestDelivery;
@@ -44,15 +45,14 @@ public class WaiterRunnable implements Runnable{
     public void run() {
         
         while(isActive){
-            
             try {
-                
                 work();
-                Thread.sleep(500);
-                
-            } catch (InterruptedException | RemoteException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Thread.sleep(200);
+   
+            } catch (RemoteException ex) {
+                Logger.getLogger(WaiterRunnable.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(WaiterRunnable.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
@@ -89,19 +89,17 @@ public class WaiterRunnable implements Runnable{
         WaiterStatus call = interfaceWaiter.lookupCalls();
         
         //if calls are found then answer else do some other work
-        if(call != null && !callDoneBefore){
+        if(call != null ){
             todo = call;
-            callDoneBefore = true;
+//            callDoneBefore = true;
         }
         else{
-            todo = interfaceWaiter.lookupTodo();
-            callDoneBefore = false;
+            todo = interfaceWaiter.lookupTodo();   
+//            callDoneBefore = false;
         }
         
-        if(todo == null){
-           
-            callDoneBefore = false;
-             return;
+        if(todo == null){           
+            todo = WaiterStatus.WAITING;
         }
         
         switch(todo){

@@ -19,7 +19,7 @@ import tuwien.sbctu.rmi.interfaces.IPizzeria;
  * @author Adnan
  */
 public class RMILoadBalancer {
-    private static IPizzeria[] p = new IPizzeria[10];
+    private static IPizzeria[] p = new IPizzeria[2];
     
     /**
      *
@@ -34,6 +34,7 @@ public class RMILoadBalancer {
         
         p[0] = enterPizzeria(10879, "pizzeria");
         p[1] = enterPizzeria(10880, "pizzeria2");
+        
         try {
             algo();
         } catch (RemoteException ex) {
@@ -55,6 +56,7 @@ public class RMILoadBalancer {
             
             for (int i = 0; i < p.length; i++) {
                 IPizzeria pizz = p[i];
+                
                 pizz.calculatePizzeriaLoad();
                 
                 // init
@@ -72,6 +74,7 @@ public class RMILoadBalancer {
                 
             }
             
+            System.out.println("MAX Load:"+maxLoad.getLoad()+" - MIN Load:"+minLoad.getLoad());
             
             int difference = (int) ((int) maxLoad.getLoad()-minLoad.getLoad());
             // check if there is something to do , number of newDeliveries orders

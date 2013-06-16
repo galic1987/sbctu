@@ -4,6 +4,7 @@
  */
 package tuwien.sbctu.rmi;
 
+import java.rmi.RemoteException;
 import tuwien.sbctu.gui.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -58,6 +59,9 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         barTable = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        entryTable1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -75,7 +79,15 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
         jLabel2.setText("Bar:");
 
         barTable.setModel(new tuwien.sbctu.gui.tablemodels.BarTableModel());
+        barTable.setColumnSelectionAllowed(true);
+        barTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane3.setViewportView(barTable);
+        barTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+
+        jLabel4.setText("Calls:");
+
+        entryTable1.setModel(new tuwien.sbctu.gui.tablemodels.DeliveryTableModel());
+        jScrollPane4.setViewportView(entryTable1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -83,9 +95,15 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(43, 43, 43)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(305, 305, 305)
+                        .addComponent(jLabel4)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -106,9 +124,12 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -122,7 +143,7 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 695, Short.MAX_VALUE)
+            .addGap(0, 1083, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -173,6 +194,8 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
                     
                 } catch (InterruptedException ex) {
                     Logger.getLogger(GUIPizzeria.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(GUIPizzeriaRMI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -189,10 +212,10 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
     /**
      *
      */
-    public void updateTables(){
+    public void updateTables() throws RemoteException{
         
         GuestGroup ggi = pizzeriaInformationInterface.getGuestGroupInfo();
-//        GuestDelivery gdi = pizzeriaInformationInterface.getGuestDeliveryInfo();
+        //        GuestDelivery gdi = pizzeriaInformationInterface.getGuestDeliveryInfo();
         Table ti = pizzeriaInformationInterface.getTableInfo();
         Order oi = pizzeriaInformationInterface.getOrderInfo();
         
@@ -203,9 +226,10 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
         if(oi != null)
             updateBar(oi);
     }
-
+    
     private void updateEntry(GuestGroup ggi){
         boolean foundGG = false;
+        System.out.println("TABLE ENTRY");
         EntryTableModel entrytm = new EntryTableModel();
         
         if(!guestGroupInfo.isEmpty()){
@@ -217,8 +241,13 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
                 }
                 if(gg.getStatus().equals(GroupStatus.WELCOME))
                     entrytm.add(gg);
+                else{
+                    entrytm.add(gg);
+                }
             }
         }
+//        else
+//            guestGroupInfo.add(ggi);
         
         if (!foundGG)
             guestGroupInfo.add(ggi);
@@ -236,11 +265,14 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
                 
                 if(tab.getId().equals(tabi.getId())){
                     tab.setTabStat(tabi.getTabStat());
+                    tab.setGroupID(tabi.getGroupID());
                     foundGG = true;
                 }
                 tabtm.add(tab);
             }
         }
+//        else
+//            tableInfo.add(tabi);
         
         if (!foundGG)
             tableInfo.add(tabi);
@@ -249,8 +281,8 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
     }
     
     private void updateBar(Order ordi){
-    boolean foundGG = false;
-        
+        boolean foundGG = false;
+        System.out.println("TABLE BAR");
         BarTableModel tabtm = new BarTableModel();
         
         if(!orderInfo.isEmpty()){
@@ -269,6 +301,8 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
                 tabtm.add(o);
             }
         }
+//        else
+//            orderInfo.add(ordi);
         
         if (!foundGG)
             orderInfo.add(ordi);
@@ -314,14 +348,17 @@ public class GUIPizzeriaRMI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable barTable;
     private javax.swing.JTable entryTable;
+    private javax.swing.JTable entryTable1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable tablesTable;
     // End of variables declaration//GEN-END:variables

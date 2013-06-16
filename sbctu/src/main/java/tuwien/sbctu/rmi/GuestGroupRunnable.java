@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.GuestGroup.GroupStatus;
+import tuwien.sbctu.models.Order;
 import tuwien.sbctu.rmi.implement.GuestGroupImpl;
 import tuwien.sbctu.rmi.interfaces.IGuestGroup;
 import tuwien.sbctu.rmi.interfaces.IPizzeria;
@@ -82,7 +83,10 @@ public class GuestGroupRunnable implements Runnable{
             case ENTERED:
                 break;
             case SITTING:
-                iPizzeria.makeOrder(iGuestGroup.getGroup().getOrder());
+                GuestGroup g = iGuestGroup.getGroup();
+                Order o = g.getOrder();
+                
+                iPizzeria.makeOrder(o);
                 iGuestGroup.setStatus(GroupStatus.ORDERED);
                 break;
             case ORDERED:

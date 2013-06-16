@@ -4,6 +4,8 @@
  */
 package tuwien.sbctu.rmi.interfaces;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import tuwien.sbctu.models.GuestDelivery;
 import tuwien.sbctu.models.GuestGroup;
 import tuwien.sbctu.models.Order;
@@ -13,16 +15,16 @@ import tuwien.sbctu.models.Table;
  *
  * @author Adnan
  */
-public interface IPizzeriaGUIRMI {
+public interface IPizzeriaGUIRMI extends Remote{
     
-    public Table getTableInfo();
-    public Order getOrderInfo();
-    public void setTableInfo(Table table);
-    public void setOrderInfo(Order order);
+    public Table getTableInfo() throws RemoteException;
+    public Order getOrderInfo() throws RemoteException;
+    public void setTableInfo(Table table) throws RemoteException;
+    public void setOrderInfo(Order order) throws RemoteException;
     
-    public GuestGroup getGuestGroupInfo();
-    public GuestDelivery getGuestDeliveryInfo();
-    public void setGuestGroupInfo(GuestGroup gg);
-    public void setGuestGroupDeliveryInfo(GuestDelivery gd);
+    public GuestGroup getGuestGroupInfo() throws RemoteException;
+    public GuestDelivery getGuestDeliveryInfo() throws RemoteException;
+    public void setGuestGroupInfo(GuestGroup gg) throws RemoteException;
+    public void setGuestGroupDeliveryInfo(GuestDelivery gd) throws RemoteException;
     
 }
