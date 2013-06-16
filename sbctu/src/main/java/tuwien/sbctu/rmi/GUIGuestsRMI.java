@@ -354,11 +354,11 @@ public class GUIGuestsRMI extends javax.swing.JFrame {
     private Pizza preparePizza(String val){
         Pizza p = null;
         if(val.equals("Margarita"))
-            p = new Pizza("MARGARITA", 5.0 , 3);
+            p = new Pizza("MARGARITA", 5.0 , 0);
         if(val.equals("Salami"))
-            p = new Pizza("SALAMI", 5.5 , 7);
+            p = new Pizza("SALAMI", 5.5 , 0);
         if(val.equals("Cardinale"))
-            p = new Pizza("CARDINALE", 6.0 , 6);
+            p = new Pizza("CARDINALE", 6.0 , 0);
         return p;
     }
     

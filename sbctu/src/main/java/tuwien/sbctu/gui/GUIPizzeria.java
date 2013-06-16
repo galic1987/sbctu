@@ -4,9 +4,11 @@
  */
 package tuwien.sbctu.gui;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import tuwien.sbctu.gui.tablemodels.ArchiveTableModel;
 import tuwien.sbctu.gui.tablemodels.BarTableModel;
 import tuwien.sbctu.gui.tablemodels.EntryTableModel;
 import tuwien.sbctu.gui.tablemodels.TablesTableModel;
@@ -57,6 +59,8 @@ public class GUIPizzeria extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         barTable = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        archiveTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -116,15 +120,24 @@ public class GUIPizzeria extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Actual", jPanel1);
 
+        archiveTable.setModel(new tuwien.sbctu.gui.tablemodels.BarTableModel());
+        jScrollPane4.setViewportView(archiveTable);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 695, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 672, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 650, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Archive", jPanel2);
@@ -149,6 +162,7 @@ public class GUIPizzeria extends javax.swing.JFrame {
     ArrayList<GuestDelivery> guestDeliveryInfo;
     ArrayList<Table> tableInfo;
     ArrayList<Order> orderInfo;
+    ArrayList<Order> archiveInfo;
     
     private IPizzeriaGUI pizzeriaInformationInterface;
     
@@ -171,6 +185,8 @@ public class GUIPizzeria extends javax.swing.JFrame {
                     
                 } catch (InterruptedException ex) {
                     Logger.getLogger(GUIPizzeria.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(GUIPizzeria.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -179,7 +195,7 @@ public class GUIPizzeria extends javax.swing.JFrame {
      * activates the thread for the GUI
      */
     public void activateThread(){
-        Updater up = new Updater();
+        GUIPizzeria.Updater up = new GUIPizzeria.Updater();
         
         up.start();
     }
@@ -187,12 +203,13 @@ public class GUIPizzeria extends javax.swing.JFrame {
     /**
      *
      */
-    public void updateTables(){
+    public void updateTables() throws RemoteException{
         
         GuestGroup ggi = pizzeriaInformationInterface.getGuestGroupInfo();
-//        GuestDelivery gdi = pizzeriaInformationInterface.getGuestDeliveryInfo();
+        //        GuestDelivery gdi = pizzeriaInformationInterface.getGuestDeliveryInfo();
         Table ti = pizzeriaInformationInterface.getTableInfo();
         Order oi = pizzeriaInformationInterface.getOrderInfo();
+        Order archive = pizzeriaInformationInterface.getArchiveInfo();
         
         if(ggi != null)
             updateEntry(ggi);
@@ -200,8 +217,10 @@ public class GUIPizzeria extends javax.swing.JFrame {
             updateTable(ti);
         if(oi != null)
             updateBar(oi);
+        if(oi != null)
+            updateArchive(archive);
     }
-
+    
     private void updateEntry(GuestGroup ggi){
         boolean foundGG = false;
         EntryTableModel entrytm = new EntryTableModel();
@@ -215,8 +234,13 @@ public class GUIPizzeria extends javax.swing.JFrame {
                 }
                 if(gg.getStatus().equals(GroupStatus.WELCOME))
                     entrytm.add(gg);
+                else{
+                    entrytm.add(gg);
+                }
             }
         }
+//        else
+//            guestGroupInfo.add(ggi);
         
         if (!foundGG)
             guestGroupInfo.add(ggi);
@@ -234,11 +258,14 @@ public class GUIPizzeria extends javax.swing.JFrame {
                 
                 if(tab.getId().equals(tabi.getId())){
                     tab.setTabStat(tabi.getTabStat());
+                    tab.setGroupID(tabi.getGroupID());
                     foundGG = true;
                 }
                 tabtm.add(tab);
             }
         }
+//        else
+//            tableInfo.add(tabi);
         
         if (!foundGG)
             tableInfo.add(tabi);
@@ -247,8 +274,7 @@ public class GUIPizzeria extends javax.swing.JFrame {
     }
     
     private void updateBar(Order ordi){
-    boolean foundGG = false;
-        
+        boolean foundGG = false;
         BarTableModel tabtm = new BarTableModel();
         
         if(!orderInfo.isEmpty()){
@@ -267,6 +293,8 @@ public class GUIPizzeria extends javax.swing.JFrame {
                 tabtm.add(o);
             }
         }
+//        else
+//            orderInfo.add(ordi);
         
         if (!foundGG)
             orderInfo.add(ordi);
@@ -274,7 +302,19 @@ public class GUIPizzeria extends javax.swing.JFrame {
         barTable.setModel(tabtm);
     }
     
-    
+    private void updateArchive(Order archive){
+        
+        ArchiveTableModel archTM = new ArchiveTableModel();
+        
+        archiveInfo.add(archive);
+        if(!archiveInfo.isEmpty())
+            for(Order o : archiveInfo)
+                archTM.add(o);
+        else
+            archTM.add(archive);    
+        
+        archiveTable.setModel(archTM);
+    }
     /**
      * @param args the command line arguments
      */
@@ -310,6 +350,7 @@ public class GUIPizzeria extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable archiveTable;
     private javax.swing.JTable barTable;
     private javax.swing.JTable entryTable;
     private javax.swing.JLabel jLabel1;
@@ -320,6 +361,7 @@ public class GUIPizzeria extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable tablesTable;
     // End of variables declaration//GEN-END:variables

@@ -25,4 +25,7 @@ public interface IPizzeriaGUI {
     public void setGuestGroupInfo(GuestGroup gg);
     public void setGuestGroupDeliveryInfo(GuestDelivery gd);
     
+    public void setArchiveInfo(Order order);
+    public Order getArchiveInfo();
+    
 }
