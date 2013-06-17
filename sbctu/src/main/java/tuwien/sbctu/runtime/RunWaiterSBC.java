@@ -44,24 +44,24 @@ public class RunWaiterSBC implements NotificationListener{
 	 * @param args
 	 */
 
-	protected static long id;
-	protected static MzsCore core;
-	protected static Capi capi;
-	protected static URI space;
-	protected static ContainerReference entrance;
-	protected static ContainerReference tables;
-	protected static ContainerReference bar;
-	protected static ContainerReference delivery;
+	protected  long id;
+	protected  MzsCore core;
+	protected  Capi capi;
+	protected  URI space;
+	protected  ContainerReference entrance;
+	protected  ContainerReference tables;
+	protected  ContainerReference bar;
+	protected  ContainerReference delivery;
 
-	protected static Waiter w;
-	protected static AtomicBoolean working;
-	protected static AtomicBoolean checkDelivery;
-	protected static String spaceAddress;
+	protected  Waiter w;
+	protected  AtomicBoolean working;
+	protected  AtomicBoolean checkDelivery;
+	protected  String spaceAddress;
 
-	protected static int timeOut;
+	protected  int timeOut;
 
 
-	public static void main(String[] args) {
+	public  void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
 		int port = Integer.valueOf(args[0]);
@@ -87,14 +87,18 @@ public class RunWaiterSBC implements NotificationListener{
 			obligatoryCoords.add(new KeyCoordinator());
 
 
-			TransactionReference tx = capi.createTransaction(timeOut, space);
+			TransactionReference tx = capi.createTransaction(timeOut, space); 
 
 			entrance = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ENTRANCE, space, timeOut, tx);
 			tables = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_TABLES, space, timeOut, tx);
 			bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, timeOut, tx);
 			delivery = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_DELIVERY, space, timeOut, tx);
 
-
+		      NotificationManager notifManager = new NotificationManager(core);
+		        Set<Operation> operations = new HashSet<Operation>();
+		        operations.add(Operation.WRITE);
+		        notifManager.createNotification(delivery, (NotificationListener) this, operations, null, null);
+		        notifManager.createNotification(entrance, (NotificationListener) this, operations, null, null);
 
 
 			for (;;) {
@@ -142,10 +146,13 @@ public class RunWaiterSBC implements NotificationListener{
 			//capi.rollbackTransaction(tx);
 			e.printStackTrace();
 
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 
-	public static void entranceTake(){
+	public  void entranceTake(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -175,7 +182,7 @@ public class RunWaiterSBC implements NotificationListener{
 	}
 
 
-	public static void ordersTake(){
+	public  void ordersTake(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -219,7 +226,7 @@ public class RunWaiterSBC implements NotificationListener{
 	}
 
 
-	public static void putThemToEat(){
+	public  void putThemToEat(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -258,7 +265,7 @@ public class RunWaiterSBC implements NotificationListener{
 	}
 
 
-	public static void doTheBilling(){
+	public  void doTheBilling(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -295,7 +302,7 @@ public class RunWaiterSBC implements NotificationListener{
 	}
 
 
-	public static boolean checkTheDeliveryOrders(){
+	public  boolean checkTheDeliveryOrders(){
 		TransactionReference tx;
 		try {
 			working.set(true);
@@ -334,18 +341,14 @@ public class RunWaiterSBC implements NotificationListener{
 	
 	
 
-	public static void printExp(Exception e){
+	public  void printExp(Exception e){
 		//e.printStackTrace();
 
 	}
 	
 	public RunWaiterSBC() throws MzsCoreException, InterruptedException{
 		// Create notification
-        NotificationManager notifManager = new NotificationManager(core);
-        Set<Operation> operations = new HashSet<Operation>();
-        operations.add(Operation.WRITE);
-        notifManager.createNotification(delivery, (NotificationListener) this, operations, null, null);
-        notifManager.createNotification(entrance, (NotificationListener) this, operations, null, null);
+  
 	}
 
 	@Override

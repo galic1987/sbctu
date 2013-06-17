@@ -38,8 +38,8 @@ public class SimulationComplete {
 		System.out.println("start delivery");
 
 		String[] del = new String[4];
-		del[0] = "8171 79 xvsm://localhost:5102";
-		del[1] = "8172 78 xvsm://localhost:5102";
+		del[0] = "8171 79 xvsm://localhost:5101";
+		del[1] = "8172 78 xvsm://localhost:5101";
 		del[2] = "8173 77 xvsm://localhost:5102";
 		del[3] = "8174 76 xvsm://localhost:5102";
 		 

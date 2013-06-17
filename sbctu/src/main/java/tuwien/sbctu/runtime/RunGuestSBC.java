@@ -199,7 +199,7 @@ public class RunGuestSBC implements NotificationListener {
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
 	        // take it from tables
-            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.DEFAULT, tx);
             Table t = entries.get(0);
             
             
@@ -237,7 +237,7 @@ public class RunGuestSBC implements NotificationListener {
 	        ArrayList<Table> entries = new ArrayList<Table>();
 	        
 	        // take it from tables
-            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.INFINITE, tx);
+            entries = capi.take(tables, Arrays.asList(KeyCoordinator.newSelector(String.valueOf(id), 1)) , RequestTimeout.DEFAULT, tx);
             Table t = entries.get(0);
             
             

@@ -20,6 +20,7 @@ import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.core.Entry;
+import org.mozartspaces.core.MzsConstants.Selecting;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
@@ -41,20 +42,20 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		 * 
 		 */
 		
-		protected static long id;
-		protected static MzsCore core;
-		protected static Capi capi;
-		protected static URI space;
-		protected static ContainerReference archive;
-		protected static ContainerReference bar;
+		protected  long id;
+		protected  MzsCore core;
+		protected  Capi capi;
+		protected  URI space;
+		protected  ContainerReference archive;
+		protected  ContainerReference bar;
 		
 		
-		protected static AtomicBoolean working;
-		protected static int timeOut;
-		protected static String spaceAddress;
+		protected  AtomicBoolean working;
+		protected  int timeOut;
+		protected  String spaceAddress;
 		
 		
-		public static void main(String[] args) {
+		public  void main(String[] args) {
 			// TODO Auto-generated method stub
 			try {
 			int port = Integer.valueOf(args[0]);
@@ -82,8 +83,8 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		        
 	            TransactionReference tx = capi.createTransaction(timeOut, space);
 
-				archive = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, RequestTimeout.INFINITE, tx);
-			    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, RequestTimeout.INFINITE, tx);
+				archive = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_ARCHIVE, space, RequestTimeout.DEFAULT, tx);
+			    bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, RequestTimeout.DEFAULT, tx);
 
 			    System.out.print("fas");
 			    //g.setStatus(GroupStatus.ENTERED);
@@ -95,12 +96,26 @@ import tuwien.sbctu.models.Order.OrderStatus;
 			  //Entry entry2 = new Entry(g, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(g.getId()+22)), QueryCoordinator.newCoordinationData()));
 
 				
-				new RunDriverSBC();
+			 // Create notification
+		        NotificationManager notifManager = new NotificationManager(core);
+		        Set<Operation> operations = new HashSet<Operation>();
+		        operations.add(Operation.WRITE);
+		        //operations.add(Operation.DELETE);
+		        notifManager.createNotification(bar, this, operations, null, null);
 				
 				//test shizzle
 				//capi.write(entrance, entry); 
 				//capi.write(entrance, entry);
 				//capi.write(entrance, entry2);
+		        
+		        while(true){
+		        	try {
+		        		if(tryToDeliverAndPutInArchive()) continue;
+		        		Thread.sleep(450);
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+		        }
 
 
 				
@@ -121,12 +136,7 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		
 		
 		public RunDriverSBC() throws MzsCoreException, InterruptedException{
-			// Create notification
-	        NotificationManager notifManager = new NotificationManager(core);
-	        Set<Operation> operations = new HashSet<Operation>();
-	        operations.add(Operation.WRITE);
-	        //operations.add(Operation.DELETE);
-	        notifManager.createNotification(bar, this, operations, null, null);
+			
 		}
 
 		@Override
@@ -152,9 +162,9 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				
 				  // take the pizza now if finished
 					if(o.getOrderstatus().equals(OrderStatus.DELIVERYCOOKED)){
-			            System.out.println("--> Notification: ID" +o.toString());
+			            //System.out.println("--> Notification: ID" +o.toString());
 
-						tryToDeliverAndPutInArchive();
+						//tryToDeliverAndPutInArchive();
 					}
 		        	 
 		        	 
@@ -173,18 +183,21 @@ import tuwien.sbctu.models.Order.OrderStatus;
 		}
 		
 		
-		public static void tryToDeliverAndPutInArchive(){
-			TransactionReference tx;
+		public  boolean tryToDeliverAndPutInArchive(){
+			TransactionReference tx = null;
+			
+			TransactionReference txone;
+
 			Order o = null;
 			try {
-				System.out.println("Trying to deliver");
+				//System.out.println("Trying to deliver");
 				tx = capi.createTransaction(timeOut, space);
 				ArrayList<Order> orders = new ArrayList<Order>();
 
 				// query coordinator
 				Query qo = new Query().sql("status = 'DELIVERYCOOKED' LIMIT 1");
 
-				orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo)) , RequestTimeout.TRY_ONCE, tx);
+				orders = capi.take(bar, Arrays.asList(QueryCoordinator.newSelector(qo,1)) , RequestTimeout.TRY_ONCE, tx);
 				 o = orders.get(0);
 
 				 
@@ -193,50 +206,59 @@ import tuwien.sbctu.models.Order.OrderStatus;
 				
 				//System.out.println("Writing bill for order id " + o.getId() + " bill " + o.writeBill() + " trying to deliver");
 
-				capi.commitTransaction(tx);
 
 				// try to deliver it takes 3 seconds
 				o.setOrderstatus(OrderStatus.DELIVERYFINISHED);
 				o.setDriverId(id);
-				
+				//capi.commitTransaction(tx);
 				// on new space
 				// Bechmark disable
 				//Thread.sleep(3000); // lasts for
 				
-				
-				URI newspace = new URI(o.getDeliveryAddress().getSpaceAddress());
-				ContainerReference deliveryAddress = capi.lookupContainer(o.getDeliveryAddress().getContainerName(), newspace, 1000, null);
+				try {
+					URI newspace = new URI(o.getDeliveryAddress().getSpaceAddress());
+//					txone = capi.createTransaction(timeOut, newspace);
+
+					ContainerReference deliveryAddress = capi.lookupContainer(o.getDeliveryAddress().getContainerName(), newspace, RequestTimeout.TRY_ONCE, null);
+					
+					Entry orderEntry1 = new Entry(o);
+
+					capi.write(orderEntry1, deliveryAddress,RequestTimeout.TRY_ONCE,null); 
+				} catch (Exception e) {
+					if(o ==  null) return false;
+					o.setOrderstatus(OrderStatus.DELIVERYFAILED);
+					Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
+
+					capi.write(orderEntry, archive,RequestTimeout.TRY_ONCE,tx);
+					capi.commitTransaction(tx);
+
+					return true;
+					// TODO: handle exception
+				}
 				
 				
 				// write in archive if delivered or not
-				Entry orderEntry1 = new Entry(o);
 				Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
 				
-				capi.write(orderEntry1, deliveryAddress,timeOut,null); 
-				capi.write(orderEntry, archive,timeOut,null);
+				
+				capi.write(orderEntry, archive,RequestTimeout.TRY_ONCE,tx);
+				capi.commitTransaction(tx);
 
 				// everything ok proceed
-				System.out.println("Delivered order with id " + o.getId() + " bill " + o.writeBill() + " trying to deliver");
-
-				
+				System.out.println("Delivered order with id " + o.getId() + " bill " + o.writeBill() + " ");
+								
 
 			} catch ( Exception e) {
-				//e.printStackTrace();
-				try{
-				// write in archive not delivered 
-					
-				if(o ==  null) return;
-				o.setOrderstatus(OrderStatus.DELIVERYFAILED);
-				Entry orderEntry = new Entry(o, Arrays.asList(KeyCoordinator.newCoordinationData(String.valueOf(o.getId())), QueryCoordinator.newCoordinationData()));
-
-				capi.write(orderEntry, archive,timeOut,null);
-
-				}catch(Exception e1){
-					
+				//e.printStackTrace();t
+				try {
+				capi.rollbackTransaction(tx);
+				} catch (Exception e1) {
+				
 				}
 
 			}finally{
 				//working.set(false);
+				return true;
 			}
 
 		}

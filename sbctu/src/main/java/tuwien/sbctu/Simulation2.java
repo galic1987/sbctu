@@ -67,7 +67,7 @@ public class Simulation2 {
 			p1.add(new Pizza("Margarite", 5.0f, 3));
 			p1.add(new Pizza("Salami", 5.5f, 7));
 
-			for (int i = 14200; i < 14301; i++){
+			for (int i = 14200; i < 14300; i++){
 				//Order o = new Order(id+i);
 				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(i, i, spaceAddress, p1);
 
@@ -88,7 +88,7 @@ public class Simulation2 {
 
 			//System.out.println(id);
 
-			for (int i = 15400; i < 15501; i++){
+			for (int i = 15400; i < 15500; i++){
 				//Order o = new Order(id+i);
 				RunDeliveryGuestSBC rb = new RunDeliveryGuestSBC(i,  i, spaceAddress, p);
 

@@ -40,18 +40,18 @@ public class RunCookSBC implements NotificationListener {
 	/**
 	 * @param args
 	 */
-	protected static long id;
-	protected static MzsCore core;
-	protected static Capi capi;
-	protected static URI space;
-	protected static ContainerReference bar;
-	protected static Cook c;
-	protected static AtomicBoolean working;
-	protected static int timeOut;
-	protected static String spaceAddress;
+	protected  long id;
+	protected  MzsCore core;
+	protected  Capi capi;
+	protected  URI space;
+	protected  ContainerReference bar;
+	protected  Cook c;
+	protected  AtomicBoolean working;
+	protected  int timeOut;
+	protected  String spaceAddress;
 
 
-	public static void main(String[] args) {
+	public  void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
 
@@ -83,7 +83,11 @@ public class RunCookSBC implements NotificationListener {
 			bar = capi.lookupContainer(PizzeriaConfiguration.CONTAINER_NAME_BAR, space, 0, tx);
 
 
-
+			// Create notification
+			NotificationManager notifManager = new NotificationManager(core);
+			Set<Operation> operations = new HashSet<Operation>();
+			operations.add(Operation.WRITE);
+			notifManager.createNotification(bar, (NotificationListener) this, operations, null, null);
 
 			for (;;) {
 				
@@ -104,7 +108,7 @@ public class RunCookSBC implements NotificationListener {
 			}
 
 
-		} catch (URISyntaxException | MzsCoreException e) {
+		} catch (URISyntaxException | MzsCoreException | InterruptedException e) {
 			// TODO Auto-generated catch block
 
 			//capi.rollbackTransaction(tx);
@@ -117,7 +121,7 @@ public class RunCookSBC implements NotificationListener {
 
 
 
-	public static void cook(){
+	public  void cook(){
 
 
 		TransactionReference tx;
@@ -160,7 +164,7 @@ public class RunCookSBC implements NotificationListener {
 
 	}
 
-	public static boolean cookForDelivery(){
+	public  boolean cookForDelivery(){
 
 
 		TransactionReference tx;
@@ -203,7 +207,7 @@ public class RunCookSBC implements NotificationListener {
 
 	}
 	
-	public static boolean cookForDeliveryTransferPriority(){
+	public  boolean cookForDeliveryTransferPriority(){
 
 
 		TransactionReference tx;
@@ -245,11 +249,7 @@ public class RunCookSBC implements NotificationListener {
 	
 	
 	public RunCookSBC() throws MzsCoreException, InterruptedException{
-		// Create notification
-		NotificationManager notifManager = new NotificationManager(core);
-		Set<Operation> operations = new HashSet<Operation>();
-		operations.add(Operation.WRITE);
-		notifManager.createNotification(bar, (NotificationListener) this, operations, null, null);
+		
 	}
 
 	@Override
