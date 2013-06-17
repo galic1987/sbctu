@@ -28,17 +28,17 @@ To run with arguments run:
 cd sbctu/sbctu
 
 Start All
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.App" -Dexec.args="5100 5101" 
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.App" -Dexec.args="5102 5101" 
 
 Start Simulation2 (200 Pizza total)
 mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation2" -Dexec.args="6101 18 xvsm://localhost:5101"
 
 
 Start Simulation1 (100 Pizza)
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation1" -Dexec.args="6000 17 xvsm://localhost:5100"
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.Simulation1" -Dexec.args="6000 17 xvsm://localhost:5102"
 
 Start Workers 
-mvn exec:java -Dexec.mainClass="tuwien.sbctu.SimulationComplete" -Dexec.args="5100 5101" 
+mvn exec:java -Dexec.mainClass="tuwien.sbctu.SimulationComplete" -Dexec.args="5102 5101" 
 
 
 
